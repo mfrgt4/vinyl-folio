@@ -170,7 +170,7 @@ export default function Home() {
           </Link>
         </div>
         <p className="mono" style={{ marginTop: 48, opacity: 0.6 }}>
-          © Vinyl Folio — Fait avec des disques & du son.
+          © Vinyl Folio — Fait avec créativité par Manon F.
         </p>
       </section>
     </div>
