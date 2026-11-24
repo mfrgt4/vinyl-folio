@@ -126,45 +126,45 @@ export default function Community() {
       </div>
       <h1 style={{ margin: "16px 0 32px" }}>COMMUNITY</h1>
 
-      {/* FILTRES - TOUJOURS VISIBLES, MÊME DANS UNE CONV */}
-      <div style={{ marginBottom: 24 }}>
-        {CATS.map((c) => (
-          <button
-            key={c}
-            className={"tag mono" + (c === cat ? " on" : "")}
-            onClick={() => setCat(c)}
+      <AnimatePresence mode="wait">
+        {/* LISTE - LE MENU : il disparaît quand tu ouvres une conv */}
+        {!t ? (
+          <motion.div
+            key="l"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            {c}
-          </button>
-        ))}
-      </div>
+            {/* FILTRES - visibles que dans la liste */}
+            <div style={{ marginBottom: 24 }}>
+              {CATS.map((c) => (
+                <button
+                  key={c}
+                  className={"tag mono" + (c === cat ? " on" : "")}
+                  onClick={() => setCat(c)}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
 
-      {/* PSEUDO - une fois pour toutes */}
-      <input
-        placeholder="Ton pseudo…"
-        value={pseudo}
-        onChange={(e) => setPseudo(e.target.value)}
-        style={{ ...line, maxWidth: 220, marginBottom: 24, fontSize: 16 }}
-      />
+            <input
+              placeholder="Ton pseudo…"
+              value={pseudo}
+              onChange={(e) => setPseudo(e.target.value)}
+              style={{ ...line, maxWidth: 220, marginBottom: 24, fontSize: 16 }}
+            />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, alignItems: "start" }}>
-        {/* MENU DES CONVS - TOUJOURS VISIBLE, MÊME QUAND UNE CONV EST OUVERTE */}
-        <div>
-          <AnimatePresence>
             {filtered.map((x, k) => (
               <motion.button
                 layout
                 key={x.id}
                 className="track"
-                style={{
-                  gridTemplateColumns: "40px 1fr auto",
-                  background: x.id === openId ? "var(--ink)" : "none",
-                  color: x.id === openId ? "var(--paper)" : "var(--ink)",
-                }}
+                style={{ gridTemplateColumns: "40px 1fr auto" }}
                 onClick={() => setOpenId(x.id)}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: k * 0.03 }}
+                transition={{ delay: k * 0.05 }}
               >
                 <span className="mono">{String(k + 1).padStart(2, "0")}</span>
                 <span style={{ fontSize: 20, textAlign: "left" }}>
@@ -177,83 +177,78 @@ export default function Community() {
                 <span className="mono">{fmtDate(x.created_at)}</span>
               </motion.button>
             ))}
-          </AnimatePresence>
 
-          {filtered.length === 0 && (
-            <p className="mono" style={{ padding: "16px 0" }}>
-              Aucune discussion pour l'instant. Sois la première à en créer une.
-            </p>
-          )}
+            {filtered.length === 0 && (
+              <p className="mono" style={{ padding: "16px 0" }}>
+                Aucune discussion pour l'instant. Sois la première à en créer une.
+              </p>
+            )}
 
-          <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
-            <input
-              aria-label="Nouveau sujet"
-              placeholder="Nouvelle discussion…"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && create()}
-              style={line}
-            />
-            <button className="btn" onClick={create}>
-              Publier
-            </button>
-          </div>
-        </div>
-
-        {/* CONV OUVERTE - À DROITE, LE MENU RESTE À GAUCHE */}
-        <div>
-          {!t ? (
-            <p className="mono" style={{ paddingTop: 12, opacity: 0.6 }}>
-              ← Choisis une discussion à gauche pour voir les messages
-            </p>
-          ) : (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <button className="mono" onClick={() => setOpenId(null)}>
-                ← Fermer
+            <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+              <input
+                aria-label="Nouveau sujet"
+                placeholder="Nouvelle discussion…"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && create()}
+                style={line}
+              />
+              <button className="btn" onClick={create}>
+                Publier
               </button>
-              <h2 style={{ fontSize: "clamp(32px,6vw,56px)", margin: "16px 0" }}>
-                {t.title}
-              </h2>
-              {posts.length === 0 && (
-                <p className="mono" style={{ padding: "12px 0" }}>
-                  Aucun message pour l'instant. Sois la première à répondre.
-                </p>
-              )}
-              {posts.map((p, k) => (
-                <motion.div
-                  key={p.id}
-                  className="track"
-                  style={{ gridTemplateColumns: "80px 1fr 60px" }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: k * 0.05 }}
-                >
-                  <span className="mono">{p.author}</span>
-                  <span>{p.content}</span>
-                  <span className="mono">{fmtDate(p.created_at)}</span>
-                </motion.div>
-              ))}
-              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-                <input
-                  aria-label="Réponse"
-                  placeholder="Votre réponse…"
-                  value={msg}
-                  onChange={(e) => setMsg(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && reply()}
-                  style={line}
-                />
-                <button className="btn" onClick={reply}>
-                  Répondre
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        ) : (
+          /* CONV SEULE - PAS DE MENU, QUE LA CONV */
+          <motion.div
+            key="c"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <button className="mono" onClick={() => setOpenId(null)}>
+              ← Index
+            </button>
+            <h2 style={{ fontSize: "clamp(32px,6vw,72px)", margin: "16px 0" }}>
+              {t.title}
+            </h2>
+
+            {posts.length === 0 && (
+              <p className="mono" style={{ padding: "12px 0" }}>
+                Aucun message pour l'instant. Sois la première à répondre.
+              </p>
+            )}
+            {posts.map((p, k) => (
+              <motion.div
+                key={p.id}
+                className="track"
+                style={{ gridTemplateColumns: "80px 1fr 60px" }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: k * 0.05 }}
+              >
+                <span className="mono">{p.author}</span>
+                <span>{p.content}</span>
+                <span className="mono">{fmtDate(p.created_at)}</span>
+              </motion.div>
+            ))}
+
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+              <input
+                aria-label="Réponse"
+                placeholder="Votre réponse…"
+                value={msg}
+                onChange={(e) => setMsg(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && reply()}
+                style={line}
+              />
+              <button className="btn" onClick={reply}>
+                Répondre
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
