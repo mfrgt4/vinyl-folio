@@ -13,10 +13,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="page">
+    <div className="page" style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
       <section
         className="hero"
-        style={{ justifyContent: "flex-end", paddingBottom: 60 }}
+        style={{ justifyContent: "flex-end", paddingBottom: 60, overflow: "hidden" }}
       >
         {/* IMAGE DE FOND */}
         <motion.div
@@ -107,13 +107,13 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* BANDEAU PLEINE LARGEUR */}
+      {/* BANDEAU PLEINE LARGEUR - SANS SCROLL HORIZONTAL */}
       <div
         className="marquee"
         aria-hidden
         style={{
-          width: "100vw",
-          marginLeft: "calc(-50vw + 50%)",
+          width: "calc(100% + 8vw)",
+          marginLeft: "-4vw",
           overflow: "hidden",
         }}
       >
