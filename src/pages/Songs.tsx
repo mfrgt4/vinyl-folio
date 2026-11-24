@@ -140,13 +140,22 @@ export default function Songs() {
       `}</style>
 
       <div className="split" style={{ alignItems: 'center' }}>
+        {/* VINYLE 3D - cover trouée + rotation + animation changement */}
         <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'} style={{ position: 'relative' }}>
-          <Suspense fallback={null}>
-            <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
-          </Suspense>
-          {cur.cover && (
-            <img src={cur.cover} alt={cur.title} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '32%', aspectRatio: '1', objectFit: 'cover', borderRadius: '50%', zIndex: 5, pointerEvents: 'none', border: '2px solid var(--paper)' }} />
-          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={cur.id}
+              initial={{ opacity: 0, scale: 0.85, rotate: -30 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 1.08, rotate: 30 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              style={{ position: 'absolute', inset: 0 }}
+            >
+              <Suspense fallback={null}>
+                <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         <div>
