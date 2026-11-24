@@ -4,10 +4,13 @@ import { Link } from "react-router-dom";
 import { supabase } from "../supabase";
 
 type St = "idle" | "loading" | "done";
-type F = { title: string; artist: string; link: string; by: string; why: string; };
+type F = { title: string; artist: string; by: string; why: string; };
 
 export default function Submit() {
-  const [f, setF] = useState<F>({ title: "", artist: "", link: "", by: "", why: "" });
+  const [f, setF] = useState<F>({ title: "", artist: "", by: "", why: "" });
+  const [mp3File, setMp3File] = useState<File | null>(null);
+  const [mp3Name, setMp3Name] = useState<string>("");
+  const [mp3Duration, setMp3Duration] = useState<string>("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [err, setErr] = useState<Record<string, string>>({});
@@ -15,6 +18,27 @@ export default function Submit() {
 
   const set = (k: keyof F) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setF({ ...f, [k]: e.target.value });
+
+  const onMp3 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".mp3") && file.type !== "audio/mpeg") {
+      setErr({ mp3: "Il faut impérativement un fichier .mp3" });
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) { setErr({ mp3: "MP3 trop lourd, max 15 Mo." }); return; }
+    setErr({});
+    setMp3File(file);
+    setMp3Name(file.name);
+    // Calcule la durée pour l'aperçu
+    const url = URL.createObjectURL(file);
+    const audio = new Audio(url);
+    audio.onloadedmetadata = () => {
+      const m = Math.floor(audio.duration / 60);
+      const s = String(Math.floor(audio.duration % 60)).padStart(2, "0");
+      setMp3Duration(`${m}:${s}`);
+    };
+  };
 
   const onCover = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -30,39 +54,46 @@ export default function Submit() {
     const e: Record<string, string> = {};
     if (!f.title.trim()) e.title = "Titre requis";
     if (!f.artist.trim()) e.artist = "Artiste requis";
-    if (!/^https?:\/\/.*(【entity-spotify¦canonical_name=Spotify】|youtu|【entity-soundcloud¦canonical_name=SoundCloud】)/i.test(f.link))
-      e.link = "Lien 【entity-Spotify¦canonical_name=Spotify】 / YouTube / 【entity-SoundCloud¦canonical_name=SoundCloud】 requis";
+    if (!mp3File) e.mp3 = "Le fichier MP3 est obligatoire";
     setErr(e);
     if (Object.keys(e).length) return;
 
     setSt("loading");
 
+    // 1. Upload MP3 - OBLIGATOIRE
+    const mp3Path = `${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+    const { error: mp3Err } = await supabase.storage.from("tracks").upload(mp3Path, mp3File!);
+    if (mp3Err) {
+      setErr({ mp3: "Impossible d'envoyer le MP3, réessaie." });
+      setSt("idle");
+      return;
+    }
+    const audio_url = supabase.storage.from("tracks").getPublicUrl(mp3Path).data.publicUrl;
+
+    // 2. Upload Cover - facultative
     let cover_url: string | null = null;
     if (coverFile) {
       const ext = coverFile.name.split(".").pop() || "jpg";
       const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upErr } = await supabase.storage.from("covers").upload(path, coverFile);
-      if (upErr) {
-        setErr({ cover: "Impossible d'envoyer la cover, réessaie." });
-        setSt("idle");
-        return;
-      }
-      cover_url = supabase.storage.from("covers").getPublicUrl(path).data.publicUrl;
+      if (!upErr) cover_url = supabase.storage.from("covers").getPublicUrl(path).data.publicUrl;
     }
 
+    // 3. Envoi proposition
     const { error } = await supabase.from("proposals").insert({
       id: "u" + Date.now(),
       title: f.title.trim(),
       artist: f.artist.trim(),
-      link: f.link.trim(),
+      link: null,
       by_name: f.by.trim() || null,
       why: f.why.trim() || null,
       cover_url,
+      audio_url,
       created_at: Date.now(),
     });
 
     if (error) {
-      setErr({ link: "Impossible d'envoyer, réessaie." });
+      setErr({ mp3: "Impossible d'envoyer, réessaie." });
       setSt("idle");
       return;
     }
@@ -91,8 +122,8 @@ export default function Submit() {
             transition={{ type: "spring", damping: 14 }}
             style={{ width: 160, height: 160, borderRadius: "50%", background: "#111", margin: "0 auto 24px", display: "grid", placeItems: "center", color: "#fff", fontSize: 48 }}
           >✓</motion.div>
-          <h2>Track &ensp; ajoutée</h2>
-          <p className="mono" style={{ margin: "16px 0" }}>Elle rejoint la collection, tout le monde peut la voir.</p>
+          <h2>Track ajoutée</h2>
+          <p className="mono" style={{ margin: "16px 0" }}>Elle rejoint la collection, tout le monde peut l'écouter.</p>
           <Link className="btn" to="/a-decouvrir">Retour à Vos chansons</Link>
         </div>
       </div>
@@ -106,9 +137,15 @@ export default function Submit() {
         <div>
           {Fld("title", "01 — Titre")}
           {Fld("artist", "02 — Artiste")}
-          {Fld("link", "03 — Lien (Spotify / YouTube / SoundCloud)")}
-          {Fld("by", "04 — Pseudo (facultatif)")}
-          {Fld("why", "05 — Pourquoi ce choix ? (facultatif)", true)}
+          {Fld("by", "03 — Pseudo (facultatif)")}
+          {Fld("why", "04 — Pourquoi ce choix ? (facultatif)", true)}
+
+          <label className="field">
+            <span className="mono">05 — Fichier MP3 * obligatoire</span>
+            <input type="file" accept=".mp3,audio/mpeg" onChange={onMp3} style={{ padding: "10px 0", border: 0 }} />
+            {mp3Name && <span className="mono" style={{ display: "block", marginTop: 8 }}>{mp3Name}{mp3Duration ? ` · ${mp3Duration}` : ""}</span>}
+            {err.mp3 && <span className="mono err">{err.mp3}</span>}
+          </label>
 
           <label className="field">
             <span className="mono">06 — Cover (facultatif)</span>
@@ -138,6 +175,7 @@ export default function Submit() {
             <p className="mono">Aperçu</p>
             <p style={{ fontWeight: 500, fontSize: 22 }}>{f.title || "Titre"}</p>
             <p className="mono">{f.artist || "Artiste"}{f.by && ` · par ${f.by}`}</p>
+            {mp3Duration && <p className="mono">Durée : {mp3Duration}</p>}
           </div>
         </div>
       </div>

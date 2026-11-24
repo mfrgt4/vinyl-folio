@@ -47,41 +47,22 @@ function Wave({ id, progress, onSeek }: { id: string; progress: number; onSeek: 
   )
 }
 
-const Icon = ({ d }: { d: string }) => (<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden><path d={d} /></svg>)
-const PREV = 'M6 6h2v12H6zM20 6v12L9.5 12z'
-const NEXT = 'M16 6h2v12h-2zM4 6l10.5 6L4 18z'
-const PLAY = 'M8 5v14l11-7z'
-const PAUSE = 'M6 5h4v14H6zM14 5h4v14h-4z'
-
-// Transforme un lien 【entity-Spotify¦canonical_name=Spotify】 / YouTube en lien embed qui joue dans la page
-function embedUrl(link: string | undefined): string | null {
-  if (!link) return null
-  if (link.includes('open.spotify.com/')) {
-    return link.replace('open.spotify.com/', 'open.spotify.com/embed/').split('?')[0]
-  }
-  if (link.includes('youtube.com/watch')) {
-    const id = link.split('v=')[1]?.split('&')[0]
-    return id ? `https://www.youtube.com/embed/${id}` : null
-  }
-  if (link.includes('youtu.be/')) {
-    const id = link.split('youtu.be/')[1]?.split('?')[0]
-    return id ? `https://www.youtube.com/embed/${id}` : null
-  }
-  if (link.includes('【entity-soundcloud¦canonical_name=SoundCloud】.com/')) return null // 【entity-SoundCloud¦canonical_name=SoundCloud】 ne permet pas l'embed simple, on ouvre le lien
-  return null
-}
-
-type Row = { id: string; title: string; artist: string; link: string | null; by_name: string | null; cover_url: string | null; created_at: number }
-
 export default function Songs() {
-  const [rows, setRows] = useState<Row[]>([])
+  const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  const list: Song[] = useMemo(() => rows.map(r => ({
-    id: r.id, title: r.title, artist: r.artist, link: r.link ?? undefined,
-    by: r.by_name ?? undefined, dur: '—:——', color: '#ED9DB5',
+  const list: Song[] = useMemo(() => rows.map((r: any) => ({
+    id: r.id,
+    title: r.title,
+    artist: r.artist,
+    link: r.link ?? undefined,
+    by: r.by_name ?? undefined,
+    dur: '—:——',
+    color: '#ED9DB5',
     cover: r.cover_url ?? undefined,
-    status: 'pending' as const, date: r.created_at,
+    src: r.audio_url ?? undefined,
+    status: 'pending' as const,
+    date: r.created_at,
   })), [rows])
 
   const [i, setI] = useState(0)
@@ -96,18 +77,17 @@ export default function Songs() {
   const progress = dur ? Math.min(1, t / dur) : 0
   const last4 = list.slice(0, 4)
   const filtered = list.filter(s => (s.title + ' ' + s.artist).toLowerCase().includes(query.toLowerCase()))
-  const embed = embedUrl(cur?.link)
 
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.from('proposals').select('*').order('created_at', { ascending: false })
-      if (data) setRows(data as Row[])
+      if (data) setRows(data as any[])
       setLoading(false)
     }
     load()
     const ch = supabase.channel('proposals-live')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, (p) => {
-        setRows(prev => [p.new as Row, ...prev])
+      .on('postgres_changes' as any, { event: 'INSERT', schema: 'public', table: 'proposals' }, (p: any) => {
+        setRows(prev => [p.new, ...prev])
       })
       .subscribe()
     return () => { supabase.removeChannel(ch) }
@@ -116,7 +96,8 @@ export default function Songs() {
   const chooseFromAll = (id: string) => {
     const k = list.findIndex(s => s.id === id)
     if (k >= 0) { setI(k); setPlaying(true) }
-    setAllOpen(false); setQuery('')
+    setAllOpen(false)
+    setQuery('')
   }
 
   useEffect(() => { setT(0); setDur(0) }, [safeI])
@@ -125,10 +106,13 @@ export default function Songs() {
     if (!el) return
     if (playing && cur?.src) el.play().catch(() => setPlaying(false))
     else el.pause()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing, safeI, cur?.src])
 
-  const go = (d: number) => { if (!list.length) return; setI(prev => (prev + d + list.length) % list.length); setPlaying(true) }
+  const go = (d: number) => {
+    if (!list.length) return
+    setI(prev => (prev + d + list.length) % list.length)
+    setPlaying(true)
+  }
   const seek = (r: number) => { if (a.current && dur) a.current.currentTime = r * dur }
 
   if (loading) return <div className="page"><p className="mono">Chargement des propositions…</p></div>
@@ -149,35 +133,25 @@ export default function Songs() {
       <style>{`
         .vw{position:relative;width:calc(100% + 18vw);margin-left:-18vw;aspect-ratio:1;cursor:pointer}
         @media(max-width:860px){.vw{width:calc(100% + 10vw);margin-left:-10vw}}
-        .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s}
+        .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s;font-size:18px}
         .pl-btn:hover{color:var(--red);transform:scale(1.12)}
-        .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s}
+        .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s;font-size:22px}
         .pl-play:hover{background:var(--red);color:#fff}
       `}</style>
 
       <div className="split" style={{ alignItems: 'center' }}>
-        {/* VINYLE + COVER AU CENTRE */}
         <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'} style={{ position: 'relative' }}>
           <Suspense fallback={null}>
             <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
           </Suspense>
           {cur.cover && (
-            <img
-              src={cur.cover}
-              alt={cur.title}
-              style={{
-                position: 'absolute', left: '50%', top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '32%', aspectRatio: '1', objectFit: 'cover',
-                borderRadius: '50%', zIndex: 5, pointerEvents: 'none',
-                border: '2px solid var(--paper)'
-              }}
-            />
+            <img src={cur.cover} alt={cur.title} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '32%', aspectRatio: '1', objectFit: 'cover', borderRadius: '50%', zIndex: 5, pointerEvents: 'none', border: '2px solid var(--paper)' }} />
           )}
         </div>
 
         <div>
           <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
+
           <div style={{ margin: '28px 0 8px' }}>
             <p className="mono" style={{ color: 'var(--red)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Eq on={playing} /> {playing ? 'En lecture' : 'En pause'} · {String(safeI + 1).padStart(2, '0')}/{String(list.length).padStart(2, '0')}
@@ -186,43 +160,20 @@ export default function Songs() {
               <motion.div key={cur.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                 <div style={{ font: '700 clamp(24px,3vw,40px)/1.1 Archivo, sans-serif', letterSpacing: '-.02em', margin: '8px 0 4px' }}>{cur.title}</div>
                 <p className="mono">{cur.artist}{cur.by ? ` · par ${cur.by}` : ''}</p>
-                {cur.cover && (
-                  <img src={cur.cover} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, marginTop: 12 }} />
-                )}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* LECTEUR : embed Spotify / YouTube si c'est une proposition, sinon lecteur audio */}
-          {embed ? (
-            <div style={{ margin: '12px 0 14px' }}>
-              <iframe
-                key={cur.id}
-                src={embed}
-                width="100%"
-                height={embed.includes('youtube') ? 200 : 152}
-                frameBorder="0"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                allowFullScreen
-                style={{ borderRadius: 12, display: 'block' }}
-              />
-              <p className="mono" style={{ marginTop: 8, opacity: .6 }}>Lecture via la plateforme — durée affichée dans le lecteur</p>
-            </div>
-          ) : (
-            <>
-              <audio ref={a} src={cur.src} onTimeUpdate={e => setT(e.currentTarget.currentTime)} onLoadedMetadata={e => setDur(e.currentTarget.duration)} onEnded={() => go(1)} />
-              <Wave id={cur.id} progress={progress} onSeek={seek} />
-              <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 14px' }}>
-                <span>{fmt(t)}</span><span>{dur ? fmt(dur) : cur.dur}</span>
-              </div>
-            </>
-          )}
+          <audio ref={a} src={cur.src} onTimeUpdate={e => setT(e.currentTarget.currentTime)} onLoadedMetadata={e => setDur(e.currentTarget.duration)} onEnded={() => go(1)} />
+          <Wave id={cur.id} progress={progress} onSeek={seek} />
+          <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 14px' }}>
+            <span>{fmt(t)}</span><span>{dur ? fmt(dur) : cur.dur}</span>
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <button className="pl-btn" aria-label="Précédent" onClick={() => go(-1)}><Icon d={PREV} /></button>
-            <motion.button className="pl-btn pl-play" aria-label={playing ? 'Pause' : 'Lecture'} whileTap={{ scale: 0.94 }} onClick={() => setPlaying(!playing)}><Icon d={playing ? PAUSE : PLAY} /></motion.button>
-            <button className="pl-btn" aria-label="Suivant" onClick={() => go(1)}><Icon d={NEXT} /></button>
-            {cur.link && <a className="mono" style={{ marginLeft: 'auto' }} href={cur.link} target="_blank" rel="noreferrer">Écouter sur la plateforme ↗</a>}
+            <button className="pl-btn" aria-label="Précédent" onClick={() => go(-1)}>⏮</button>
+            <motion.button className="pl-btn pl-play" aria-label={playing ? 'Pause' : 'Lecture'} whileTap={{ scale: 0.94 }} onClick={() => setPlaying(!playing)}>{playing ? '❚❚' : '▶'}</motion.button>
+            <button className="pl-btn" aria-label="Suivant" onClick={() => go(1)}>⏭</button>
           </div>
 
           <p className="mono" style={{ color: 'var(--red)', margin: '36px 0 4px' }}>Les 4 dernières</p>
@@ -233,13 +184,18 @@ export default function Songs() {
                 {k === safeI && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
                 <span className="mono">{k === safeI ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
                 <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <span><b style={{ fontWeight: 500 }}>{s.title}</b><br /><span className="mono">{s.artist}{s.by ? ` · par ${s.by}` : ''}</span></span>
+                <span>
+                  <b style={{ fontWeight: 500 }}>{s.title}</b><br />
+                  <span className="mono">{s.artist}{s.by ? ` · par ${s.by}` : ''}</span>
+                </span>
                 <span className="mono">{s.dur}</span>
               </button>
             )
           })}
 
-          <button className="btn" style={{ marginTop: 24, width: '100%' }} onClick={() => setAllOpen(true)}>Afficher toutes les propositions ({list.length})</button>
+          <button className="btn" style={{ marginTop: 24, width: '100%' }} onClick={() => setAllOpen(true)}>
+            Afficher toutes les propositions ({list.length})
+          </button>
           <Link className="btn" style={{ marginTop: 12 }} to="/ajouter">Proposer une chanson</Link>
         </div>
       </div>
@@ -258,7 +214,10 @@ export default function Songs() {
                 <button key={s.id} onClick={() => chooseFromAll(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'baseline', gap: 16, padding: '16px 0', background: 'none', border: 0, borderBottom: '1px solid #d8d7d2', color: 'var(--ink)', textAlign: 'left', cursor: 'pointer' }}>
                   <span className="mono" style={{ opacity: .5 }}>{String(k + 1).padStart(2, '0')}</span>
                   {s.cover && <img src={s.cover} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />}
-                  <span style={{ flex: 1 }}><span style={{ display: 'block', fontSize: 17 }}>{s.title}</span><span className="mono" style={{ opacity: .6 }}>{s.artist} {s.by ? `· par ${s.by}` : ''}</span></span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: 'block', fontSize: 17 }}>{s.title}</span>
+                    <span className="mono" style={{ opacity: .6 }}>{s.artist} {s.by ? `· par ${s.by}` : ''}</span>
+                  </span>
                   <span className="mono">→</span>
                 </button>
               ))}
