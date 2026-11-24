@@ -2,8 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { VINYLS } from '../data'
 
-/** Disque : glisse hors de la pochette puis tourne, avec accélération et ralentissement progressifs */
-function Disc({ spinning }: { spinning: boolean }) {
+/**
+ * Disque : 3 états enchaînés de façon fluide
+ *  - repos   : caché derrière la pochette
+ *  - survol  : sort un peu (20 %), sans tourner
+ *  - lecture : sort complètement (42 %) et tourne, avec accélération / ralentissement progressifs
+ */
+function Disc({ spinning, hover }: { spinning: boolean; hover: boolean }) {
   const el = useRef<HTMLDivElement>(null)
   const s = useRef({ a: 0, v: 0 })       // angle (deg) et vitesse (deg/s)
   const target = useRef(0)
@@ -18,21 +23,22 @@ function Disc({ spinning }: { spinning: boolean }) {
       s.current.v += (target.current - s.current.v) * Math.min(1, dt * 2.2) // inertie
       s.current.a = (s.current.a + s.current.v * dt) % 360
       if (el.current) el.current.style.transform = `rotate(${s.current.a}deg)`
-      // la boucle s'arrête quand le disque est à l'arrêt
-      if (target.current === 0 && s.current.v < 0.3) return
+      if (target.current === 0 && s.current.v < 0.3) return // arrêt de la boucle
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [spinning])
 
+  const x = spinning ? 42 : hover ? 20 : 0
   return (
     <div
       style={{
         position: 'absolute',
         inset: '4%',
-        transform: spinning ? 'translateX(42%)' : 'translateX(0)',
-        transition: 'transform 1s cubic-bezier(.22,1,.36,1)',
+        transform: `translateX(${x}%)`,
+        // même courbe pour survol -> lecture : le passage d'un état à l'autre est continu
+        transition: 'transform .9s cubic-bezier(.22,1,.36,1)',
       }}
     >
       <div
@@ -42,7 +48,6 @@ function Disc({ spinning }: { spinning: boolean }) {
           height: '100%',
           borderRadius: '50%',
           position: 'relative',
-          // reflet conique + sillons : le reflet rend la rotation visible
           background:
             'conic-gradient(from 0deg, transparent 0 18%, rgba(255,255,255,.14) 24%, transparent 30% 68%, rgba(255,255,255,.1) 74%, transparent 80%), repeating-radial-gradient(#111 0 2px, #1b1b1b 3px 4px)',
           boxShadow: '0 10px 24px -12px #000a',
@@ -60,6 +65,7 @@ export default function Records() {
   const [i, setI] = useState(0)
   const [open, setOpen] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [hoverId, setHoverId] = useState<string | null>(null)
   const n = VINYLS.length
   const lock = useRef(false)
   const touchX = useRef(0)
@@ -69,9 +75,10 @@ export default function Records() {
 
   // Bloque le défilement de la page tant qu'on est sur "Mes Musiques"
   useEffect(() => {
-    const prev = document.body.style.overflow
+    const b = document.body.style.overflow, h = document.documentElement.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
+    document.documentElement.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = b; document.documentElement.style.overflow = h }
   }, [])
 
   // Changement de vinyle : la musique s'arrête et le disque rentre dans sa pochette
@@ -128,9 +135,10 @@ export default function Records() {
               aria-label={o === 0 ? (playing ? `Pause ${v.title}` : `Lire ${v.title}`) : v.title}
               onClick={() => (o === 0 ? toggle() : setI(k))}
               onKeyDown={e => e.key === 'Enter' && (o === 0 ? toggle() : setI(k))}
+              onMouseEnter={() => setHoverId(v.id)}
+              onMouseLeave={() => setHoverId(null)}
               style={{ top: '50%', marginTop: -120 }}
               animate={{
-                // quand le disque sort, les vinyles de droite s'écartent pour lui laisser la place
                 x: o * 190 + Math.sign(o) * 70 + (playing && o > 0 ? 60 : 0),
                 scale: o === 0 ? 1.25 : 0.8,
                 rotateY: o * -32,
@@ -139,7 +147,7 @@ export default function Records() {
               }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             >
-              <Disc spinning={spinning} />
+              <Disc spinning={spinning} hover={hoverId === v.id} />
               <div
                 className="cover"
                 style={{
@@ -147,7 +155,7 @@ export default function Records() {
                   backgroundImage: v.cover ? `url("${v.cover}")` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  transform: 'none', // la pochette reste fixe (désactive le décalage au survol)
+                  transform: 'none', // la pochette ne bouge pas
                 }}
               >
                 {!v.cover && (
