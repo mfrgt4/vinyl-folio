@@ -170,9 +170,9 @@ export default function Records() {
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)' }}>{cur.title}</h2>
-          <p className="mono" style={{ color: 'var(--red)' }}>{cur.cat} / {cur.year}</p>
+        <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)', margin: 0 }}>{cur.title}</h2>
+          <p className="mono" style={{ color: 'var(--red)', margin: 0 }}>{cur.cat} / {cur.year}</p>
         </motion.div>
       </AnimatePresence>
 
@@ -190,8 +190,8 @@ export default function Records() {
             style={{ position: 'fixed', inset: 0, zIndex: 80, background: '#171717ee', color: 'var(--paper)', display: 'grid', placeItems: 'center', padding: 24 }}
           >
             <motion.div initial={{ y: 40 }} animate={{ y: 0 }} style={{ maxWidth: 560, maxHeight: '90dvh', overflow: 'auto' }}>
-              <p className="mono">{cur.cat} — {cur.year}</p>
-              <h2>{cur.title}</h2>
+              <p className="mono" style={{ margin: '0 0 14px' }}>{cur.cat} — {cur.year}</p>
+              <h2 style={{ margin: 0 }}>{cur.title}</h2>
               <p style={{ margin: '20px 0' }}>{cur.desc}</p>
               <p className="mono">Genres : {cur.tools.join(' · ')}</p>
               <p className="mono" style={{ marginTop: 24 }}>Cliquer pour fermer</p>
