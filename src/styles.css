@@ -4,9 +4,9 @@ a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer;backgrou
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey)}
 h1,h2{font-family:Archivo,sans-serif;font-stretch:75%;font-weight:800;line-height:.88;letter-spacing:-.03em;text-transform:uppercase}
 h1{font-size:clamp(56px,13vw,200px)}h2{font-size:clamp(40px,8vw,110px)}
-.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;color:#fff}
-.nav nav{display:flex;gap:28px}.nav a{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;position:relative;mix-blend-mode:difference;color:#fff}
-.nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:#BF2158}
+.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;mix-blend-mode:difference;color:#fff}
+.nav nav{display:flex;gap:28px}.nav a{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;position:relative}
+.nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:#29C68A}
 .burger{display:none}
 @media(max-width:860px){.burger{display:block}.nav nav{position:fixed;inset:0;background:var(--ink);flex-direction:column;justify-content:center;align-items:center;font-size:24px;transform:translateY(-100%);transition:transform .7s cubic-bezier(.7,0,.2,1)}.nav nav.open{transform:none}}
 .page{min-height:100vh;padding:120px 4vw 60px}
