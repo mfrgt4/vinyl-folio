@@ -50,6 +50,7 @@ function Wave({ id, progress, onSeek }: { id: string; progress: number; onSeek: 
 export default function Songs() {
   const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [durs, setDurs] = useState<Record<string, string>>({})
 
   const list: Song[] = useMemo(() => rows.map((r: any) => ({
     id: r.id,
@@ -57,13 +58,13 @@ export default function Songs() {
     artist: r.artist,
     link: r.link ?? undefined,
     by: r.by_name ?? undefined,
-    dur: '—:——',
+    dur: durs[r.id] ?? '—:——',
     color: '#BF2158',
     cover: r.cover_url ?? undefined,
     src: r.audio_url ?? undefined,
     status: 'pending' as const,
     date: r.created_at,
-  })), [rows])
+  })), [rows, durs])
 
   const [i, setI] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -92,6 +93,21 @@ export default function Songs() {
       .subscribe()
     return () => { supabase.removeChannel(ch) }
   }, [])
+
+  // VRAIE DURÉE DE CHAQUE MP3 - pour l'afficher au bout de chaque ligne
+  useEffect(() => {
+    rows.forEach((r: any) => {
+      if (!r.audio_url || durs[r.id]) return
+      const tmp = new Audio()
+      tmp.preload = 'metadata'
+      tmp.onloadedmetadata = () => {
+        if (tmp.duration && isFinite(tmp.duration)) {
+          setDurs(prev => ({ ...prev, [r.id]: fmt(tmp.duration) }))
+        }
+      }
+      tmp.src = r.audio_url
+    })
+  }, [rows])
 
   const chooseFromAll = (id: string) => {
     const k = list.findIndex(s => s.id === id)
@@ -201,6 +217,7 @@ export default function Songs() {
                   <b style={{ fontWeight: 500 }}>{s.title}</b><br />
                   <span className="mono">{s.artist}{s.by ? ` · par ${s.by}` : ''}</span>
                 </span>
+                {/* DURÉE AU BOUT, À DROITE */}
                 <span className="mono">{s.dur}</span>
               </button>
             )
@@ -231,7 +248,7 @@ export default function Songs() {
                     <span style={{ display: 'block', fontSize: 17 }}>{s.title}</span>
                     <span className="mono" style={{ opacity: .6 }}>{s.artist} {s.by ? `· par ${s.by}` : ''}</span>
                   </span>
-                  <span className="mono">→</span>
+                  <span className="mono">{durs[s.id] ?? '—:——'}</span>
                 </button>
               ))}
             </motion.div>
