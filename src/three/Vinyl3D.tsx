@@ -12,7 +12,7 @@ interface P {
   cover?: string
 }
 
-const PINK = '#ED9DB5'
+const PINK = '#BF2158'
 
 const toTex = (c: HTMLCanvasElement) => {
   const t = new THREE.CanvasTexture(c)

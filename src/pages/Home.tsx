@@ -36,7 +36,7 @@ export default function Home() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to bottom, rgba(23,23,23,.55), rgba(23,23,23,.75)), radial-gradient(circle at 50% 50%, #ED9DB544, #171717 60%)",
+              "linear-gradient(to bottom, rgba(23,23,23,.55), rgba(23,23,23,.75)), radial-gradient(circle at 50% 50%, #BF215844, #171717 60%)",
           }}
         />
         {/* TEXTES EN BAS */}

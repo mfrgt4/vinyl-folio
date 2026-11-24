@@ -1,4 +1,4 @@
-:root{--bg:#E8E7E2;--paper:#F5F4F0;--ink:#171717;--grey:#777671;--line:#D2D1CC;--pink:#ED9DB5;--pink-dark:#C46A8A}
+:root{--bg:#E8E7E2;--paper:#F5F4F0;--ink:#171717;--grey:#777671;--line:#D2D1CC;--pink:#BF2158;--pink-dark:#C46A8A}
 *{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--ink);font:300 16px/1.6 Inter,sans-serif}
 a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey)}

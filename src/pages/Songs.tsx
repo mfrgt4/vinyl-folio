@@ -58,7 +58,7 @@ export default function Songs() {
     link: r.link ?? undefined,
     by: r.by_name ?? undefined,
     dur: '—:——',
-    color: '#ED9DB5',
+    color: '#BF2158',
     cover: r.cover_url ?? undefined,
     src: r.audio_url ?? undefined,
     status: 'pending' as const,
@@ -131,8 +131,8 @@ export default function Songs() {
   return (
     <div className="page" style={{ overflow: 'hidden' }}>
       <style>{`
-        .vw{position:relative;width:calc(100% + 18vw);margin-left:-18vw;aspect-ratio:1;cursor:pointer}
-        @media(max-width:860px){.vw{width:calc(100% + 10vw);margin-left:-10vw}}
+        .vw{position:relative;width:min(440px,100%);aspect-ratio:1;cursor:pointer;margin:0 auto}
+        @media(max-width:860px){.vw{width:min(340px,88vw)}}
         .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s;font-size:18px}
         .pl-btn:hover{color:var(--pink);transform:scale(1.12)}
         .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s;font-size:22px}
@@ -140,7 +140,7 @@ export default function Songs() {
       `}</style>
 
       <div className="split" style={{ alignItems: 'center' }}>
-        {/* VINYLE 3D - cover trouée + rotation + animation changement */}
+        {/* VINYLE 3D - taille normale, cover trouée + rotation + animation changement */}
         <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'} style={{ position: 'relative' }}>
           <AnimatePresence mode="wait">
             <motion.div
