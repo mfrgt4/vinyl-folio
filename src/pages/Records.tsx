@@ -8,7 +8,7 @@ import { VINYLS } from '../data'
  *  - survol  : sort un peu (20 %), sans tourner
  *  - lecture : sort complètement (42 %) et tourne, avec accélération / ralentissement progressifs
  */
-function Disc({ spinning, hover }: { spinning: boolean; hover: boolean }) {
+function Disc({ spinning, hover, color }: { spinning: boolean; hover: boolean; color: string }) {
   const el = useRef<HTMLDivElement>(null)
   const s = useRef({ a: 0, v: 0 })       // angle (deg) et vitesse (deg/s)
   const target = useRef(0)
@@ -53,7 +53,8 @@ function Disc({ spinning, hover }: { spinning: boolean; hover: boolean }) {
           boxShadow: '0 10px 24px -12px #000a',
         }}
       >
-        <div style={{ position: 'absolute', inset: '36%', borderRadius: '50%', background: '#873B43' }}>
+        {/* MILIEU DU VINYLE = couleur du vinyle, pas du rouge en dur */}
+        <div style={{ position: 'absolute', inset: '36%', borderRadius: '50%', background: color }}>
           <div style={{ position: 'absolute', top: '10%', left: '46%', width: '8%', height: '8%', borderRadius: '50%', background: '#E8E7E2' }} />
         </div>
       </div>
@@ -146,7 +147,7 @@ export default function Records() {
               }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             >
-              <Disc spinning={spinning} hover={hoverId === v.id} />
+              <Disc spinning={spinning} hover={hoverId === v.id} color={v.color} />
               <div
                 className="cover"
                 style={{
