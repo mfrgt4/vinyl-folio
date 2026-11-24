@@ -1,10 +1,9 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 const Booklet = lazy(() => import('../three/Booklet'))
 
 export default function About() {
   const [open, setOpen] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   const lines = [
     'TRACK 01 — Présentation',
     'Manon, 20 ans, créative et passionnée de musique.',
@@ -20,19 +19,6 @@ export default function About() {
     return () => { document.body.style.overflow = b; document.documentElement.style.overflow = h }
   }, [])
 
-  // SON D'OUVERTURE DU LIVRET - DOUX
-  const toggleBook = () => {
-    if (!open) {
-      if (!audioRef.current) {
-        audioRef.current = new Audio('/sounds/Open.mp3')
-      }
-      audioRef.current.currentTime = 0
-      audioRef.current.volume = 0.3
-      audioRef.current.play().catch(() => {})
-    }
-    setOpen(!open)
-  }
-
   return (
     <div
       className="page"
@@ -46,8 +32,8 @@ export default function About() {
           tabIndex={0}
           aria-expanded={open}
           aria-label={open ? 'Fermer le livret' : 'Ouvrir le livret'}
-          onClick={toggleBook}
-          onKeyDown={e => e.key === 'Enter' && toggleBook()}
+          onClick={() => setOpen(!open)}
+          onKeyDown={e => e.key === 'Enter' && setOpen(!open)}
           style={{
             position: 'relative',
             aspectRatio: '16/9',
