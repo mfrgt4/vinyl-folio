@@ -67,12 +67,25 @@ export default function Records() {
   const [open, setOpen] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [hoverId, setHoverId] = useState<string | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const n = VINYLS.length
   const lock = useRef(false)
   const touchX = useRef(0)
   const a = useRef<HTMLAudioElement>(null)
   const go = (d: number) => setI(x => Math.min(n - 1, Math.max(0, x + d)))
   const cur = VINYLS[i]
+
+  // Recherche : filtre sur titre + artiste
+  const results = VINYLS.filter(v =>
+    (v.title + ' ' + v.cat).toLowerCase().includes(query.toLowerCase())
+  )
+  const choose = (id: string) => {
+    const k = VINYLS.findIndex(v => v.id === id)
+    if (k >= 0) setI(k)
+    setSearchOpen(false)
+    setQuery('')
+  }
 
   // Bloque le défilement de la page tant qu'on est sur "Mes Musiques"
   useEffect(() => {
@@ -89,6 +102,7 @@ export default function Records() {
     const k = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') go(1)
       if (e.key === 'ArrowLeft') go(-1)
+      if (e.key === 'Escape') { setSearchOpen(false); setOpen(false) }
     }
     addEventListener('keydown', k)
     return () => removeEventListener('keydown', k)
@@ -118,9 +132,19 @@ export default function Records() {
         const dx = e.changedTouches[0].clientX - touchX.current
         if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1)
       }}
-      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '90px 4vw 24px', display: 'flex', flexDirection: 'column' }}
+      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '90px 4vw 24px', display: 'flex', flexDirection: 'column', position: 'relative' }}
     >
       <audio ref={a} src={cur.audio} onEnded={() => setPlaying(false)} />
+
+      {/* BOUTON LOUPE - en haut à droite */}
+      <button
+        className="mono"
+        onClick={() => setSearchOpen(true)}
+        aria-label="Rechercher une musique"
+        style={{ position: 'absolute', top: 92, right: '4vw', zIndex: 20, width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--ink)', background: 'var(--paper)', cursor: 'pointer', fontSize: 18, display: 'grid', placeItems: 'center' }}
+      >
+        🔍
+      </button>
 
       <div className="stage" style={{ flex: 1, minHeight: 0, height: 'auto', marginTop: 0 }}>
         {VINYLS.map((v, k) => {
@@ -181,6 +205,50 @@ export default function Records() {
         <button className="mono" onClick={() => setOpen(true)}>Détails</button>
         <button className="mono" onClick={() => go(1)}>Suiv. →</button>
       </div>
+
+      {/* MENU RECHERCHE - par-dessus la page */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setSearchOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 90, background: '#171717ee', color: 'var(--paper)', display: 'grid', placeItems: 'center', padding: 24 }}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 560, maxHeight: '80dvh', overflow: 'auto', background: '#1c1c1c', borderRadius: 16, padding: 24 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p className="mono">Rechercher une musique</p>
+                <button className="mono" onClick={() => setSearchOpen(false)}>✕ Fermer</button>
+              </div>
+              <input
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Titre ou artiste…"
+                style={{ width: '100%', margin: '20px 0', padding: '12px 0', background: 'none', border: 0, borderBottom: '1px solid var(--paper)', color: 'var(--paper)', font: '300 20px Inter', outline: 0 }}
+              />
+              {results.length === 0 && <p className="mono">Aucun résultat.</p>}
+              {results.map(v => (
+                <button
+                  key={v.id}
+                  onClick={() => choose(v.id)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 16, padding: '14px 0', background: 'none', border: 0, borderBottom: '1px solid #333', color: 'var(--paper)', textAlign: 'left', cursor: 'pointer' }}
+                >
+                  <span style={{ width: 44, height: 44, borderRadius: '50%', background: v.color, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 12 }}>●</span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: 'block', fontSize: 18 }}>{v.title}</span>
+                    <span className="mono" style={{ opacity: .7 }}>{v.cat} — {v.year}</span>
+                  </span>
+                  <span className="mono">→</span>
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {open && (
