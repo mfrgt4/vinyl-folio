@@ -117,8 +117,12 @@ export default function Community() {
     if (data) setOpenId(data.id);
   };
 
-  const fmtDate = (d: string) =>
-    new Date(d).toLocaleDateString("fr", { day: "2-digit", month: "2-digit" });
+  // DATE SOUS LA FORME "24 Nov"
+  const MONTHS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+  const fmtDate = (d: string) => {
+    const date = new Date(d);
+    return `${date.getDate()} ${MONTHS[date.getMonth()]}`;
+  };
 
   return (
     <div className="page">
