@@ -1,5 +1,5 @@
 export interface Vinyl { id:string; title:string; cat:string; year:number; color:string; cover?:string; audio?:string; desc:string; tools:string[] }
-export interface Song { id:string; title:string; artist:string; dur:string; color:string; cover?:string; src?:string; link?:string; by?:string; status:'ok'|'pending' }
+export interface Song { id:string; title:string; artist:string; dur:string; color:string; cover?:string; src?:string; link?:string; by?:string; status:'ok'|'pending'; date?:number }
 export interface Post { a:string; t:string; d:string }
 export interface Thread { id:string; title:string; author:string; cat:string; date:string; posts:Post[] }
 export const CATS = ['All','General','Music','Cinema','Gaming','Random']

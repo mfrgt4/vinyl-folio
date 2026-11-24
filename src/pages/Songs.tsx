@@ -87,14 +87,30 @@ const PAUSE = 'M6 5h4v14H6zM14 5h4v14h-4z'
 
 export default function Songs() {
   const [saved] = useLS<Song[]>('vf-songs', [])
-  const list = [...SONGS, ...saved] // propositions visibles en démo, marquées "en validation"
+  const list = [...SONGS, ...saved] // toutes les musiques pour le lecteur
   const [i, setI] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [t, setT] = useState(0)
   const [dur, setDur] = useState(0)
+  const [allOpen, setAllOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const a = useRef<HTMLAudioElement>(null)
   const cur = list[i]
   const progress = dur ? Math.min(1, t / dur) : 0
+
+  // QUE LES 4 DERNIÈRES SUR LA PAGE (les propositions ajoutées sont les plus récentes)
+  const last4 = list.slice(-4)
+
+  // DANS LE MENU "TOUTES" : que les propositions ajoutées via le formulaire, avec recherche
+  const filtered = saved.filter(s =>
+    (s.title + ' ' + s.artist).toLowerCase().includes(query.toLowerCase())
+  )
+  const chooseFromAll = (id: string) => {
+    const k = list.findIndex(s => s.id === id)
+    if (k >= 0) { setI(k); setPlaying(true) }
+    setAllOpen(false)
+    setQuery('')
+  }
 
   useEffect(() => { setT(0); setDur(0) }, [i])
   useEffect(() => {
@@ -163,23 +179,79 @@ export default function Songs() {
             {cur.link && <a className="mono" style={{ marginLeft: 'auto' }} href={cur.link} target="_blank" rel="noreferrer">Écouter sur la plateforme ↗</a>}
           </div>
 
-          {/* File d'attente */}
-          <p className="mono" style={{ color: 'var(--red)', margin: '36px 0 4px' }}>File d’attente</p>
-          {list.map((s, k) => (
-            <button key={s.id} className={'track' + (k === i ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
-              {k === i && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
-              <span className="mono">{k === i ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
-              <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              <span>
-                <b style={{ fontWeight: 500 }}>{s.title}</b><br />
-                <span className="mono">{s.artist}{s.status === 'pending' ? ' · en validation' : ''}</span>
-              </span>
-              <span className="mono">{s.dur}</span>
-            </button>
-          ))}
-          <Link className="btn" style={{ marginTop: 24 }} to="/ajouter">Proposer une chanson</Link>
+          {/* File d'attente - QUE LES 4 DERNIÈRES */}
+          <p className="mono" style={{ color: 'var(--red)', margin: '36px 0 4px' }}>Les 4 dernières</p>
+          {last4.map((s) => {
+            const k = list.findIndex(x => x.id === s.id)
+            return (
+              <button key={s.id} className={'track' + (k === i ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
+                {k === i && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
+                <span className="mono">{k === i ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
+                <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                <span>
+                  <b style={{ fontWeight: 500 }}>{s.title}</b><br />
+                  <span className="mono">{s.artist}{s.status === 'pending' ? ' · en validation' : ''}</span>
+                </span>
+                <span className="mono">{s.dur}</span>
+              </button>
+            )
+          })}
+
+          {/* BOUTON AFFICHER TOUTES LES PROPOSITIONS */}
+          <button className="btn" style={{ marginTop: 24, width: '100%' }} onClick={() => setAllOpen(true)}>
+            Afficher toutes les propositions ({saved.length})
+          </button>
+
+          <Link className="btn" style={{ marginTop: 12 }} to="/ajouter">Proposer une chanson</Link>
         </div>
       </div>
+
+      {/* MENU "TOUTES LES PROPOSITIONS" - comme la recherche, sobre */}
+      <AnimatePresence>
+        {allOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setAllOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(23,23,23,.25)', display: 'grid', placeItems: 'center', padding: 24 }}
+          >
+            <motion.div
+              initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 520, maxHeight: '80dvh', overflow: 'auto', background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--ink)', padding: '28px 28px 12px' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p className="mono" style={{ margin: 0 }}>Toutes les propositions</p>
+                <button className="mono" onClick={() => setAllOpen(false)} style={{ background: 'none', border: 0, cursor: 'pointer', padding: 0 }}>Fermer</button>
+              </div>
+
+              <input
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Titre ou artiste…"
+                style={{ width: '100%', margin: '20px 0 8px', padding: '10px 0', background: 'none', border: 0, borderBottom: '1px solid var(--ink)', color: 'var(--ink)', font: '300 18px Inter', outline: 0 }}
+              />
+
+              {filtered.length === 0 && <p className="mono" style={{ padding: '16px 0' }}>Aucune proposition pour l'instant.</p>}
+
+              {filtered.map((s, k) => (
+                <button
+                  key={s.id}
+                  onClick={() => chooseFromAll(s.id)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'baseline', gap: 16, padding: '16px 0', background: 'none', border: 0, borderBottom: '1px solid #d8d7d2', color: 'var(--ink)', textAlign: 'left', cursor: 'pointer' }}
+                >
+                  <span className="mono" style={{ opacity: .5 }}>{String(k + 1).padStart(2, '0')}</span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: 'block', fontSize: 17 }}>{s.title}</span>
+                    <span className="mono" style={{ opacity: .6 }}>{s.artist} {s.by ? `· par ${s.by}` : ''} · en validation</span>
+                  </span>
+                  <span className="mono">→</span>
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

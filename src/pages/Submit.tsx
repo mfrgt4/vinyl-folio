@@ -30,8 +30,8 @@ export default function Submit() {
     const e: Record<string, string> = {};
     if (!f.title.trim()) e.title = "Titre requis";
     if (!f.artist.trim()) e.artist = "Artiste requis";
-    if (!/^https?:\/\/.*(spotify|youtu|soundcloud)/i.test(f.link))
-      e.link = "Lien Spotify / YouTube / SoundCloud requis";
+    if (!/^https?:\/\/.*(【entity-spotify¦canonical_name=Spotify】|youtu|【entity-soundcloud¦canonical_name=SoundCloud】)/i.test(f.link))
+      e.link = "Lien 【entity-Spotify¦canonical_name=Spotify】 / YouTube / 【entity-SoundCloud¦canonical_name=SoundCloud】 requis";
     setErr(e);
     if (Object.keys(e).length) return;
     setSt("loading");
@@ -47,7 +47,9 @@ export default function Submit() {
           dur: "—:——",
           color: "#873B43",
           status: "pending",
-        },
+          // DATE POUR TRIER LES 4 DERNIÈRES
+          date: Date.now(),
+        } as Song,
       ]);
       setSt("done");
     }, 1400);
