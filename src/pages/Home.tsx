@@ -9,7 +9,7 @@ export default function Home() {
     <section className="hero">
       <motion.div style={{position:'absolute',inset:0,y,scale:s,background:'radial-gradient(circle at 50% 50%,#873B4344,#171717 60%)'}}/>
       {!mobile && <Suspense fallback={null}><Particles/></Suspense>}
-      <p className="mono" style={{color:'#aaa'}}>Plateforme musicale personnelle & collaborative</p>
+      <p className="mono" style={{color:'#aaa',marginBottom:20}}>Plateforme musicale personnelle & collaborative</p>
       <h1 aria-label="Vinyl Folio">{'VINYL FOLIO'.split('').map((c,i)=><motion.span key={i} style={{display:'inline-block',whiteSpace:'pre'}} initial={{y:'110%',opacity:0}} animate={{y:0,opacity:1}} transition={{delay:.4+i*.04,duration:.8,ease:[.2,.8,.2,1]}}>{c}</motion.span>)}</h1>
       <div style={{display:'flex',gap:16,marginTop:32,marginBottom:48}}><Link className="btn" to="/mes-musiques">Mes Musiques</Link><Link className="btn" to="/ajouter">Ajouter une musique</Link></div>
     </section>
