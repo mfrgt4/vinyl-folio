@@ -1,14 +1,24 @@
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
 /** Livret 3D : la couverture pivote autour de la charnière x=0 pour révéler la double page. */
 function Book({ open }: { open: boolean }) {
   const root = useRef<THREE.Group>(null); const cover = useRef<THREE.Group>(null); const t = useRef(0)
 
-  // TEXTURE DE LA COUVERTURE - ton GIF
-  const coverTexture = useLoader(THREE.TextureLoader, '/images/couverture.mp4')
-  coverTexture.colorSpace = THREE.SRGBColorSpace
+  // VIDÉO DE LA COUVERTURE - VideoTexture pour .mp4
+  const coverTexture = useMemo(() => {
+    const video = document.createElement('video')
+    video.src = '/images/couverture.mp4'
+    video.muted = true
+    video.loop = true
+    video.autoplay = true
+    video.playsInline = true
+    video.play().catch(() => {})
+    const texture = new THREE.VideoTexture(video)
+    texture.colorSpace = THREE.SRGBColorSpace
+    return texture
+  }, [])
 
   useFrame(({ clock }, d) => {
     t.current += ((open ? 1 : 0) - t.current) * Math.min(1, d * 3.2)
@@ -26,7 +36,7 @@ function Book({ open }: { open: boolean }) {
     <mesh position={[1,0,0]} material={paper}><boxGeometry args={[2,2.6,.04]}/></mesh>
     <mesh position={[0,-1.45,-.3]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[7,3]}/><shadowMaterial opacity={.15}/></mesh>
     <group ref={cover}>
-      {/* Ordre des faces : [+x, -x, +y, -y, +z avant, -z] -> on met le GIF sur la face avant */}
+      {/* Ordre des faces : [+x, -x, +y, -y, +z avant, -z] -> on met la vidéo sur la face avant */}
       <mesh position={[1,0,.05]} material={[paper,paper,paper,paper,coverMat,paper]}><boxGeometry args={[2,2.6,.04]}/></mesh>
     </group>
     <ambientLight intensity={.9}/><directionalLight position={[3,4,5]} intensity={1.2}/>
