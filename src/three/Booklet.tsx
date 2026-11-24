@@ -7,7 +7,7 @@ function Book({ open }: { open: boolean }) {
   const root = useRef<THREE.Group>(null); const cover = useRef<THREE.Group>(null); const t = useRef(0)
 
   // TEXTURE DE LA COUVERTURE - ton GIF
-  const coverTexture = useLoader(THREE.TextureLoader, '/images/couverture.gif')
+  const coverTexture = useLoader(THREE.TextureLoader, '/images/couverture.mp4')
   coverTexture.colorSpace = THREE.SRGBColorSpace
 
   useFrame(({ clock }, d) => {
