@@ -36,7 +36,13 @@ export const VINYLS: Vinyl[] = [
   cover:'/covers/4-Minutes.jpeg',
   audio:'/audios/4-Minutes.mp3',
   desc:'Un morceau qui ne te laisse pas respirer. Ce que j’aime ici, c’est l’énergie et le rythme qui pousse à bouger, avec ce refrain qui te reste en tête toute la journée.',
-  tools:['Pop', 'R&B']}]
+  tools:['Pop', 'R&B']},
+
+ {id:'v6',title:'Bite The Bait',cat:'Rochelle Jordan',year:2025,color:'#222',
+  cover:'/covers/Bite-The-Bait.jpg',
+  audio:'/audios/Bite-The-Bait.mp3',
+  desc:'Un morceau sensuel et hypnotique. Rochelle Jordan pose sa voix avec douceur et arrive à te fait bouger sans t’en rendre compte. Ce que j’aime ici, c’est le côté séducteur et cette basse qui te garde accrochée du début à la fin.',
+  tools:['House', 'R&B']}]  
 
 export const SONGS: Song[] = [
  {id:'s1',title:'Borderline',artist:'Tame Impala',dur:'4:08',color:'#873B43',src:S+'1.mp3',status:'ok'},
