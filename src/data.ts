@@ -14,7 +14,7 @@ export const VINYLS: Vinyl[] = [
   desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent avec énergie pop constante. Les artistes se répondent comme une vraie rencontre plutôt qu’un simple featuring.',
   tools:['K-pop','Electro']},
 
- {id:'v2',title:'R U Mine',cat:'Arctic Monkeys',year:2012,color:'#222',
+ {id:'v2',title:'R U Mine',cat:'Arctic Monkeys',year:2012,color:'#FFFFFF',
   cover:'/covers/R-U-Mine.jpg',
   audio:'/audios/R-U-Mine.mp3',
   desc:'Un riff qui te prend dès la première seconde. Ce que j’aime ici, c’est la tension et l’énergie brute.',
@@ -26,7 +26,7 @@ export const VINYLS: Vinyl[] = [
   desc:'Un titre qui claque dès les premières secondes. Cette musique dégage un flow grâce à son refrain qui reste en tête. Ce que j’aime ici, c’est l’attitude et le côté show, comme si le morceau était pensé pour la scène.',
   tools:['K-pop','Pop', 'Electro']},
 
- {id:'v4',title:'Loser',cat:'Tame Impala',year:2025,color:'#222',
+ {id:'v4',title:'Loser',cat:'Tame Impala',year:2025,color:'#FFFFFF',
   cover:'/covers/Loser.jpeg',
   audio:'/audios/Loser.mp3',
   desc:'Un morceau qui plane et qui groove en même temps. Tame Impala crée une ambiance à la fois mélancolique et hypnotique. Ce que j’aime ici, c’est le contraste entre la douceur de la voix et la basse.',
@@ -38,7 +38,7 @@ export const VINYLS: Vinyl[] = [
   desc:'Un morceau qui ne te laisse pas respirer. Ce que j’aime ici, c’est l’énergie et le rythme qui pousse à bouger, avec ce refrain qui te reste en tête toute la journée.',
   tools:['Pop', 'R&B']},
 
- {id:'v6',title:'Bite The Bait',cat:'Rochelle Jordan',year:2025,color:'#222',
+ {id:'v6',title:'Bite The Bait',cat:'Rochelle Jordan',year:2025,color:'#FFFFFF',
   cover:'/covers/Bite-The-Bait.jpg',
   audio:'/audios/Bite-The-Bait.mp3',
   desc:'Un morceau sensuel et hypnotique. Rochelle Jordan pose sa voix avec douceur et arrive à te fait bouger sans t’en rendre compte. Ce que j’aime ici, c’est le côté séducteur et cette basse qui te garde accrochée du début à la fin.',
