@@ -1,19 +1,11 @@
 import { useEffect } from "react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 
 export default function Home() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, 120]);
   const s = useTransform(scrollY, [0, 600], [1, 1.15]);
-
-  // EFFET SOURIS - le fond bouge légèrement avec la souris
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 50, damping: 20 });
-  const sy = useSpring(my, { stiffness: 50, damping: 20 });
-  const bgX = useTransform(sx, [-0.5, 0.5], [-18, 18]);
-  const bgY = useTransform(sy, [-0.5, 0.5], [-12, 12]);
 
   // FORCER TOUT EN HAUT À L'ARRIVÉE SUR LA PAGE
   useEffect(() => {
@@ -25,20 +17,14 @@ export default function Home() {
       <section
         className="hero"
         style={{ justifyContent: "flex-end", paddingBottom: 60, overflow: "hidden" }}
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          mx.set((e.clientX - r.left) / r.width - 0.5);
-          my.set((e.clientY - r.top) / r.height - 0.5);
-        }}
       >
         {/* IMAGE DE FOND */}
         <motion.div
           style={{
             position: "absolute",
-            inset: "-3%",
+            inset: 0,
             y,
             scale: s,
-            x: bgX,
             backgroundImage: "url('/images/hero.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -53,71 +39,6 @@ export default function Home() {
               "linear-gradient(to bottom, rgba(23,23,23,.55), rgba(23,23,23,.75)), radial-gradient(circle at 50% 50%, #BF215844, #171717 60%)",
           }}
         />
-
-        {/* VINYLE GÉANT QUI TOURNE DERRIÈRE LE TITRE */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          style={{
-            position: "absolute",
-            left: "50%",
-            bottom: -140,
-            width: 620,
-            height: 620,
-            marginLeft: -310,
-            borderRadius: "50%",
-            opacity: 0.28,
-            background:
-              "repeating-radial-gradient(circle at center, #0a0a0a 0 2px, #1d1d1d 3px 4px)",
-            boxShadow: "inset 0 0 0 1px rgba(255,255,255,.08)",
-          }}
-        >
-          {/* Étiquette centrale rose */}
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: 150,
-              height: 150,
-              marginLeft: -75,
-              marginTop: -75,
-              borderRadius: "50%",
-              background: "#BF2158",
-              display: "grid",
-              placeItems: "center",
-            }}
-          >
-            <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#F5F4F0" }} />
-          </div>
-          {/* Reflet réaliste fixe */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "50%",
-              background:
-                "linear-gradient(115deg, transparent 42%, rgba(255,255,255,.18) 48%, rgba(255,255,255,.05) 52%, transparent 60%)",
-            }}
-          />
-        </motion.div>
-
-        {/* BALAYAGE DE LUMIÈRE ROSE QUI PASSE TOUTES LES 6s */}
-        <motion.div
-          animate={{ x: ["-30%", "130%"] }}
-          transition={{ duration: 3.2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            width: "22%",
-            background:
-              "linear-gradient(to right, transparent, rgba(191,33,88,.22), rgba(255,255,255,.12), transparent)",
-            transform: "skewX(-18deg)",
-            pointerEvents: "none",
-          }}
-        />
-
         {/* TEXTES EN BAS */}
         <div
           style={{
