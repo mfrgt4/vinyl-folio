@@ -54,32 +54,56 @@ function grooveTexture() {
   return toTex(c)
 }
 
-/** Reflet — version compatible partout, sans createConicGradient */
+/** Reflet réaliste - nappe douce et floue, pas des bandes dures */
 function sheenTexture() {
   const S = 512
   const c = makeCanvas(S)
   const g = c.getContext('2d')
   if (!g) return toTex(c)
   const R = S / 2
-  // Deux éclats doux opposés, dessinés à la main
   g.clearRect(0, 0, S, S)
-  for (const angle of [Math.PI * 0.25, Math.PI * 1.25]) {
+
+  // 1 seul grand reflet doux en haut à gauche, comme une fenêtre
+  // On le dessine en 5 couches de plus en plus transparentes pour faire un flou
+  for (let i = 0; i < 5; i++) {
+    const angle = Math.PI * 0.25
+    const spread = 0.55 - i * 0.06
+    const alpha = 0.035 + i * 0.012 // max ~0.09, très discret
     const grad = g.createLinearGradient(
       R + Math.cos(angle) * R,
       R + Math.sin(angle) * R,
       R,
       R
     )
-    grad.addColorStop(0, 'rgba(255,255,255,0.28)')
-    grad.addColorStop(0.5, 'rgba(255,255,255,0.06)')
+    grad.addColorStop(0, `rgba(255,255,255,${alpha})`)
+    grad.addColorStop(0.6, `rgba(255,255,255,${alpha * 0.4})`)
     grad.addColorStop(1, 'rgba(255,255,255,0)')
     g.fillStyle = grad
     g.beginPath()
     g.moveTo(R, R)
-    g.arc(R, R, R, angle - 0.18, angle + 0.18)
+    g.arc(R, R, R, angle - spread, angle + spread)
     g.closePath()
     g.fill()
   }
+
+  // 2ème reflet très faint en bas à droite, à peine visible
+  const angle2 = Math.PI * 1.25
+  const grad2 = g.createLinearGradient(
+    R + Math.cos(angle2) * R,
+    R + Math.sin(angle2) * R,
+    R,
+    R
+  )
+  grad2.addColorStop(0, 'rgba(255,255,255,0.05)')
+  grad2.addColorStop(0.6, 'rgba(255,255,255,0.015)')
+  grad2.addColorStop(1, 'rgba(255,255,255,0)')
+  g.fillStyle = grad2
+  g.beginPath()
+  g.moveTo(R, R)
+  g.arc(R, R, R, angle2 - 0.4, angle2 + 0.4)
+  g.closePath()
+  g.fill()
+
   return toTex(c)
 }
 
@@ -197,7 +221,6 @@ function useLabel(title: string, num: number, color: string, cover?: string) {
 
 function Scene({ playing, kick, color, title, num, progress, cover }: P) {
   const spin = useRef<THREE.Group>(null)
-  const sheen = useRef<THREE.Mesh>(null)
   const v = useRef(0)
 
   const grooves = useMemo(() => grooveTexture(), [])
@@ -227,11 +250,11 @@ function Scene({ playing, kick, color, title, num, progress, cover }: P) {
     v.current = -14
   }, [kick])
 
-  useFrame(({ clock }, d) => {
+  useFrame((_, d) => {
     const target = playing ? 2.6 : 0
     v.current += (target - v.current) * Math.min(1, d * 2.2)
     if (spin.current) spin.current.rotation.z += v.current * d
-    if (sheen.current) sheen.current.rotation.z = clock.elapsedTime * 0.15
+    // Le reflet ne tourne PLUS - il reste fixe comme une vraie lumière de pièce
   })
 
   const a = progress * Math.PI * 2
@@ -259,9 +282,10 @@ function Scene({ playing, kick, color, title, num, progress, cover }: P) {
         </mesh>
       </group>
 
-      <mesh ref={sheen} position={[0, 0, 0.03]}>
+      {/* REFLET FIXE - hors du groupe qui tourne, donc il ne tourne pas avec le vinyle */}
+      <mesh position={[0, 0, 0.03]}>
         <circleGeometry args={[2.2, 128]} />
-        <meshBasicMaterial map={shine} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial map={shine} transparent blending={THREE.AdditiveBlending} depthWrite={false} opacity={0.55} />
       </mesh>
 
       <group rotation={[0, 0, Math.PI / 2]}>
