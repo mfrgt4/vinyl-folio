@@ -46,10 +46,21 @@ export default function About() {
             <div style={{ position: 'absolute', inset: 0 }}><Booklet open={open} /></div>
           </Suspense>
 
+          {/* CONTENU - BOUGE AVEC LE LIVRET QUAND OUVERT */}
           <motion.div
             initial={false}
-            animate={{ opacity: open ? 1 : 0 }}
-            transition={{ delay: open ? 0.7 : 0, duration: 0.6 }}
+            animate={{
+              opacity: open ? 1 : 0,
+              // Même respiration que le livret 3D en dessous
+              y: open ? [0, -5, 0, 5, 0] : 0,
+              rotate: open ? [0, 0.3, 0, -0.3, 0] : 0,
+            }}
+            transition={{
+              opacity: { delay: open ? 0.7 : 0, duration: 0.6 },
+              // Boucle infinie, même rythme que le livret : ~5.2s
+              y: open ? { duration: 5.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 },
+              rotate: open ? { duration: 6.9, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 },
+            }}
             style={{ position: 'absolute', left: '24.5%', top: '20.5%', width: '51%', height: '59%', display: 'grid', gridTemplateColumns: '1fr 1fr', pointerEvents: 'none', overflow: 'hidden' }}
           >
             {/* IMAGE À GAUCHE */}
