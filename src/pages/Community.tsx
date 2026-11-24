@@ -25,6 +25,10 @@ export default function Community() {
   const [pseudo, setPseudo] = useState("");
   const [online, setOnline] = useState(1);
 
+  // THÈME CHOISI POUR LA NOUVELLE DISCUSSION
+  const THEMES = CATS.filter((c) => c !== "All");
+  const [newCat, setNewCat] = useState(THEMES[0] ?? "General");
+
   // VRAI NOMBRE DE PERSONNES EN LIGNE - Supabase Presence
   useEffect(() => {
     const channel = supabase.channel("online-users", {
@@ -105,7 +109,7 @@ export default function Community() {
       .insert({
         title: title.trim(),
         author: pseudo.trim() || "vous",
-        cat: cat === "All" ? "General" : cat,
+        cat: newCat,
       })
       .select()
       .single();
@@ -184,7 +188,8 @@ export default function Community() {
               </p>
             )}
 
-            <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+            {/* CRÉER UNE DISCUSSION - AVEC CHOIX DU THÈME */}
+            <div style={{ display: "flex", gap: 12, marginTop: 32, flexWrap: "wrap", alignItems: "flex-end" }}>
               <input
                 aria-label="Nouveau sujet"
                 placeholder="Nouvelle discussion…"
@@ -193,10 +198,32 @@ export default function Community() {
                 onKeyDown={(e) => e.key === "Enter" && create()}
                 style={line}
               />
+              <select
+                aria-label="Thème de la discussion"
+                value={newCat}
+                onChange={(e) => setNewCat(e.target.value)}
+                style={{
+                  background: "none",
+                  border: 0,
+                  borderBottom: "1px solid var(--ink)",
+                  font: "300 16px Inter",
+                  padding: "6px 0",
+                  color: "var(--ink)",
+                  outline: 0,
+                  cursor: "pointer",
+                }}
+              >
+                {THEMES.map((th) => (
+                  <option key={th} value={th}>{th}</option>
+                ))}
+              </select>
               <button className="btn" onClick={create}>
                 Publier
               </button>
             </div>
+            <p className="mono" style={{ marginTop: 8, opacity: 0.6 }}>
+              Thème choisi : {newCat}
+            </p>
           </motion.div>
         ) : (
           /* CONV SEULE - PAS DE MENU, QUE LA CONV */
@@ -212,6 +239,9 @@ export default function Community() {
             <h2 style={{ fontSize: "clamp(32px,6vw,72px)", margin: "16px 0" }}>
               {t.title}
             </h2>
+            <p className="mono" style={{ marginBottom: 16 }}>
+              {t.author} · {t.cat}
+            </p>
 
             {posts.length === 0 && (
               <p className="mono" style={{ padding: "12px 0" }}>
