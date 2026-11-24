@@ -8,15 +8,19 @@ const S = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-'
 // "cat" = artistes · "tools" = genres
 // "cover" = image dans public/covers/ · "audio" = fichier dans public/audios/ (les deux sont facultatifs)
 export const VINYLS: Vinyl[] = [
- {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#873B43',
+ {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#9D5ACB',
   cover:'/covers/Know-My-Name.jpeg',
   audio:'/audios/Know-My-Name.mp3',
-  desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent, entre énergie pop et groove R&B. Ce que j’aime ici, c’est le contraste des voix et l’impression d’une vraie rencontre plutôt que d’un simple featuring. À écouter fort.',
-  tools:['K-pop','R&B']},
- {id:'v2',title:'Titre 2',cat:'Artiste 2',year:2025,color:'#171717',desc:'Votre texte.',tools:['Pop']},
- {id:'v3',title:'Titre 3',cat:'Artiste 3',year:2024,color:'#777671',desc:'Votre texte.',tools:['Rock']},
+  desc:'',
+  tools:['K-pop','Electro']},
+ {id:'v2',title:'Titre 2',cat:'Artiste 2',year:2025,color:'#D2D1CC',desc:'Votre texte.',tools:['Pop']},
+ {id:'v3',title:'Watch Me',cat:'Sophie Powers, Mimi Webb',year:2026,color:'#9B0545',
+  cover:'/covers/Watch-Me.jpeg',
+  audio:'/audios/Watch-Me.mp3',
+  desc:'',
+  tools:['K-pop','Pop', 'Electro']},
  {id:'v4',title:'Titre 4',cat:'Artiste 4',year:2023,color:'#D2D1CC',desc:'Votre texte.',tools:['Jazz']},
- {id:'v5',title:'Titre 5',cat:'Artiste 5',year:2022,color:'#3a3a38',desc:'Votre texte.',tools:['Electro']}]
+ {id:'v5',title:'Titre 5',cat:'Artiste 5',year:2022,color:'#D2D1CC',desc:'Votre texte.',tools:['Electro']}]
 
 export const SONGS: Song[] = [
  {id:'s1',title:'Borderline',artist:'Tame Impala',dur:'4:08',color:'#873B43',src:S+'1.mp3',status:'ok'},
