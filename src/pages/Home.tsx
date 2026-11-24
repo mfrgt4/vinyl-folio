@@ -1,7 +1,14 @@
+import { useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 export default function Home() {
   const { scrollY } = useScroll(); const y = useTransform(scrollY, [0, 600], [0, 120]); const s = useTransform(scrollY, [0, 600], [1, 1.15])
+
+  // FORCER TOUT EN HAUT À L'ARRIVÉE SUR LA PAGE
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   return (<div className="page">
     <section className="hero" style={{justifyContent:'flex-end', paddingBottom:60}}>
       {/* IMAGE DE FOND */}
