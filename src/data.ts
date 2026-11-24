@@ -1,5 +1,5 @@
 export interface Vinyl { id:string; title:string; cat:string; year:number; color:string; cover?:string; audio?:string; desc:string; tools:string[] }
-export interface Song { id:string; title:string; artist:string; dur:string; color:string; src?:string; link?:string; by?:string; status:'ok'|'pending' }
+export interface Song { id:string; title:string; artist:string; dur:string; color:string; cover?:string; src?:string; link?:string; by?:string; status:'ok'|'pending' }
 export interface Post { a:string; t:string; d:string }
 export interface Thread { id:string; title:string; author:string; cat:string; date:string; posts:Post[] }
 export const CATS = ['All','General','Music','Cinema','Gaming','Random']
@@ -45,10 +45,10 @@ export const VINYLS: Vinyl[] = [
   tools:['House', 'R&B']}]  
 
 export const SONGS: Song[] = [
- {id:'s1',title:'Borderline',artist:'Tame Impala',dur:'4:08',color:'#873B43',src:S+'1.mp3',status:'ok'},
- {id:'s2',title:'Feels Like We Only Go Backwards',artist:'Tame Impala',dur:'3:12',color:'#4a6a6a',src:S+'2.mp3',status:'ok'},
- {id:'s3',title:'Nightcall',artist:'Kavinsky',dur:'4:18',color:'#222',src:S+'3.mp3',status:'ok'},
- {id:'s4',title:'Genesis',artist:'Grimes',dur:'4:15',color:'#777671',src:S+'4.mp3',status:'ok'}]
+ {id:'s1',title:'Borderline',artist:'Tame Impala',dur:'4:08',color:'#873B43',cover:'/covers/Borderline.jpeg',src:S+'1.mp3',status:'ok'},
+ {id:'s2',title:'Feels Like We Only Go Backwards',artist:'Tame Impala',dur:'3:12',color:'#4a6a6a',cover:'/covers/Feels-Like-We-Only-Go-Backwards.jpeg',src:S+'2.mp3',status:'ok'},
+ {id:'s3',title:'Nightcall',artist:'Kavinsky',dur:'4:18',color:'#222',cover:'/covers/Nightcall.jpeg',src:S+'3.mp3',status:'ok'},
+ {id:'s4',title:'Genesis',artist:'Grimes',dur:'4:15',color:'#777671',cover:'/covers/Genesis.jpeg',src:S+'4.mp3',status:'ok'}]
 
 export const THREADS: Thread[] = [
  {id:'t1',title:'Le dernier album qui vous a retourné ?',author:'mira',cat:'Music',date:'2026-11-20',posts:[{a:'mira',t:'Je cherche des idées, surprenez-moi.',d:'20/11'},{a:'jo',t:'Currents, encore et toujours.',d:'20/11'}]},

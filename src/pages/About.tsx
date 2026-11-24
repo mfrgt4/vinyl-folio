@@ -22,7 +22,7 @@ export default function About() {
   return (
     <div
       className="page"
-      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '90px 4vw 24px', display: 'flex', flexDirection: 'column' }}
+      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
       <p className="mono">03 — À propos</p>
 
@@ -38,7 +38,8 @@ export default function About() {
           style={{
             position: 'relative',
             aspectRatio: '16/9',
-            width: 'min(1100px, 100%, calc((100dvh - 230px) * 16 / 9))',
+            // LIVRET PLUS GROS : 1400px au lieu de 1100px, et presque toute la largeur / hauteur
+            width: 'min(1400px, 98%, calc((100dvh - 160px) * 16 / 9))',
             cursor: 'pointer',
           }}
         >
@@ -50,15 +51,21 @@ export default function About() {
             initial={false}
             animate={{ opacity: open ? 1 : 0 }}
             transition={{ delay: open ? 0.7 : 0, duration: 0.6 }}
-            style={{ position: 'absolute', left: '24.5%', top: '20.5%', width: '51%', height: '59%', display: 'grid', gridTemplateColumns: '1fr 1fr', pointerEvents: 'none' }}
+            style={{ position: 'absolute', left: '24.5%', top: '20.5%', width: '51%', height: '59%', display: 'grid', gridTemplateColumns: '1fr 1fr', pointerEvents: 'none', overflow: 'hidden' }}
           >
+            {/* IMAGE À GAUCHE */}
             <motion.div
               animate={{ scale: open ? 1.04 : 1 }}
               transition={{ duration: 6 }}
-              style={{ background: 'linear-gradient(135deg,#fff,#555 70%,#111)', filter: 'grayscale(1) contrast(1.2)' }}
-              aria-label="Portrait (à remplacer par votre photo)"
-            />
-            <div style={{ background: '#171717', color: '#ddd', padding: '6%', fontSize: 'clamp(8px,1.2vw,14px)' }}>
+              style={{ position: 'relative', overflow: 'hidden', background: '#111' }}
+            >
+              <img
+                src="/images/portrait.jpg"
+                alt="Portrait"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(1) contrast(1.15)' }}
+              />
+            </motion.div>
+            <div style={{ background: '#171717', color: '#ddd', padding: '8%', fontSize: 'clamp(11px,1.4vw,17px)', lineHeight: 1.6 }}>
               {lines.map((l, k) => (
                 <motion.p
                   key={k}
@@ -66,7 +73,7 @@ export default function About() {
                   initial={false}
                   animate={{ opacity: open ? 1 : 0, y: open ? 0 : 10 }}
                   transition={{ delay: 1 + k * 0.2 }}
-                  style={{ marginBottom: 10 }}
+                  style={{ marginBottom: 14 }}
                 >
                   {l}
                 </motion.p>
@@ -75,7 +82,7 @@ export default function About() {
           </motion.div>
         </div>
 
-        <p className="mono" style={{ textAlign: 'center', marginTop: 16 }}>
+        <p className="mono" style={{ textAlign: 'center', marginTop: 12 }}>
           {open ? 'Cliquer pour refermer' : 'Cliquer pour ouvrir le livret'}
         </p>
       </div>
