@@ -5,10 +5,13 @@ import { VINYLS } from '../data'
 export default function Records() {
   const [i, setI] = useState(0)
   const [open, setOpen] = useState(false)
+  const [playing, setPlaying] = useState(false)
   const n = VINYLS.length
   const lock = useRef(false)
   const touchX = useRef(0)
+  const a = useRef<HTMLAudioElement>(null)
   const go = (d: number) => setI(x => Math.min(n - 1, Math.max(0, x + d)))
+  const cur = VINYLS[i]
 
   // Bloque le défilement de la page tant qu'on est sur "Mes Musiques"
   useEffect(() => {
@@ -16,6 +19,9 @@ export default function Records() {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
   }, [])
+
+  // Quand on change de vinyle, la musique s'arrête
+  useEffect(() => { a.current?.pause(); setPlaying(false) }, [i])
 
   // Flèches du clavier
   useEffect(() => {
@@ -27,7 +33,7 @@ export default function Records() {
     return () => removeEventListener('keydown', k)
   }, [])
 
-  // Molette / trackpad (horizontal ou vertical) : un cran à la fois
+  // Molette / trackpad : un cran à la fois
   const onWheel = (e: React.WheelEvent) => {
     const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
     if (lock.current || Math.abs(d) < 30) return
@@ -36,7 +42,14 @@ export default function Records() {
     setTimeout(() => (lock.current = false), 450)
   }
 
-  const cur = VINYLS[i]
+  // Lecture / pause de la musique du vinyle sélectionné
+  const toggle = () => {
+    const el = a.current
+    if (!el || !cur.audio) { setOpen(true); return } // pas d'audio => on ouvre la fiche
+    if (playing) { el.pause(); setPlaying(false) }
+    else el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+  }
+
   return (
     <div
       className="page"
@@ -46,29 +59,24 @@ export default function Records() {
         const dx = e.changedTouches[0].clientX - touchX.current
         if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1)
       }}
-      style={{
-        height: '100dvh',
-        minHeight: 0,
-        overflow: 'hidden',
-        padding: '90px 4vw 24px',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '90px 4vw 24px', display: 'flex', flexDirection: 'column' }}
     >
+      <audio ref={a} src={cur.audio} onEnded={() => setPlaying(false)} />
       <p className="mono">02 — Collection</p>
 
-      {/* La scène prend tout l'espace restant ; les vinyles sont centrés dedans */}
       <div className="stage" style={{ flex: 1, minHeight: 0, height: 'auto', marginTop: 0 }}>
         {VINYLS.map((v, k) => {
           const o = k - i
+          const spinning = o === 0 && playing
           return (
             <motion.div
               key={v.id}
               className="rec"
               role="button"
               tabIndex={0}
-              aria-label={v.title}
-              onClick={() => (o === 0 ? setOpen(true) : setI(k))}
+              aria-label={o === 0 ? (playing ? `Pause ${v.title}` : `Lire ${v.title}`) : v.title}
+              onClick={() => (o === 0 ? toggle() : setI(k))}
+              onKeyDown={e => e.key === 'Enter' && (o === 0 ? toggle() : setI(k))}
               style={{ top: '50%', marginTop: -120 }}
               animate={{
                 x: o * 190 + Math.sign(o) * 70,
@@ -79,7 +87,15 @@ export default function Records() {
               }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             >
-              <div className="disc" />
+              {/* Pendant la lecture : le disque sort de la pochette et tourne */}
+              <div
+                className="disc"
+                style={{
+                  translate: spinning ? '30% 0' : undefined,
+                  transition: 'translate .8s cubic-bezier(.2,.8,.2,1)',
+                  animation: spinning ? 'spin 3s linear infinite' : undefined,
+                }}
+              />
               <div
                 className="cover"
                 style={{
@@ -87,6 +103,7 @@ export default function Records() {
                   backgroundImage: v.cover ? `url("${v.cover}")` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
+                  transform: spinning ? 'translateX(-14%)' : undefined,
                 }}
               >
                 {!v.cover && (
@@ -104,11 +121,15 @@ export default function Records() {
         <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)' }}>{cur.title}</h2>
           <p className="mono" style={{ color: 'var(--red)' }}>{cur.cat} / {cur.year}</p>
+          <p className="mono" style={{ marginTop: 6 }}>
+            {cur.audio ? (playing ? '❚❚ En lecture — cliquer la pochette pour mettre en pause' : '▶ Cliquer la pochette pour écouter') : 'Pas de fichier audio'}
+          </p>
         </motion.div>
       </AnimatePresence>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 16 }}>
         <button className="mono" onClick={() => go(-1)}>← Préc.</button>
+        <button className="mono" onClick={() => setOpen(true)}>Détails</button>
         <button className="mono" onClick={() => go(1)}>Suiv. →</button>
       </div>
 

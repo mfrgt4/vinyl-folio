@@ -1,13 +1,16 @@
-export interface Vinyl { id:string; title:string; cat:string; year:number; color:string; cover?:string; desc:string; tools:string[] }
+export interface Vinyl { id:string; title:string; cat:string; year:number; color:string; cover?:string; audio?:string; desc:string; tools:string[] }
 export interface Song { id:string; title:string; artist:string; dur:string; color:string; src?:string; link?:string; by?:string; status:'ok'|'pending' }
 export interface Post { a:string; t:string; d:string }
 export interface Thread { id:string; title:string; author:string; cat:string; date:string; posts:Post[] }
 export const CATS = ['All','General','Music','Cinema','Gaming','Random']
 const S = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-'
 
-// "cat" = artistes · "tools" = genres · "cover" = image dans public/covers/ (facultatif)
+// "cat" = artistes · "tools" = genres
+// "cover" = image dans public/covers/ · "audio" = fichier dans public/audios/ (les deux sont facultatifs)
 export const VINYLS: Vinyl[] = [
- {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#873B43',cover:'/covers/Know-My-Name.jpeg',
+ {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#873B43',
+  cover:'/covers/Know-My-Name.jpeg',
+  audio:'/audios/Know-My-Name.mp3',
   desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent, entre énergie pop et groove R&B. Ce que j’aime ici, c’est le contraste des voix et l’impression d’une vraie rencontre plutôt que d’un simple featuring. À écouter fort.',
   tools:['K-pop','R&B']},
  {id:'v2',title:'Titre 2',cat:'Artiste 2',year:2025,color:'#171717',desc:'Votre texte.',tools:['Pop']},
