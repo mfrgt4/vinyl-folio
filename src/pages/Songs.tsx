@@ -141,16 +141,16 @@ export default function Songs() {
       `}</style>
 
       <div className="split" style={{ alignItems: 'center', position: 'relative', gridTemplateColumns: '1.05fr 0.95fr', gap: '24px' }}>
-        {/* VINYLE GÉANT - collé à gauche, rapproché à droite, ne touche jamais le texte */}
+        {/* VINYLE GÉANT - taille directe, pas d'effet de zoom à l'arrivée */}
         <div className="vw-wrap">
           <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={cur.id}
-                initial={{ opacity: 0, scale: 0.85, rotate: -30 }}
+                initial={{ opacity: 0 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 1.08, rotate: 30 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
                 style={{ position: 'absolute', inset: 0 }}
               >
                 <Suspense fallback={null}>
