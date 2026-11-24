@@ -47,30 +47,23 @@ function labelTexture(title: string, num: number, color: string) {
 }
 
 function Scene({ playing, kick, color, title, num, progress }: P) {
-  const spin = useRef<THREE.Group>(null), tilt = useRef<THREE.Group>(null), sheen = useRef<THREE.Mesh>(null)
-  const v = useRef(0), sc = useRef(1), hover = useRef(false)
+  const spin = useRef<THREE.Group>(null), sheen = useRef<THREE.Mesh>(null)
+  const v = useRef(0)
   const grooves = useMemo(grooveTexture, []), shine = useMemo(sheenTexture, [])
   const label = useMemo(() => labelTexture(title, num, color), [title, num, color])
   const arc = useMemo(() => new THREE.RingGeometry(2.42, 2.44, 128, 1, 0, Math.max(.001, progress * Math.PI * 2)), [progress])
   useEffect(() => () => arc.dispose(), [arc])
   useEffect(() => { v.current = -14 }, [kick]) // scratch au changement de titre
 
-  useFrame(({ pointer, clock }, d) => {
-    const k = Math.min(1, d * 3)
+  useFrame(({ clock }, d) => {
     v.current += ((playing ? 2.6 : 0) - v.current) * Math.min(1, d * 2.2) // inertie au démarrage / à l'arrêt
     if (spin.current) spin.current.rotation.z += v.current * d
-    sc.current += ((hover.current ? 1.04 : 1) - sc.current) * Math.min(1, d * 6)
-    if (tilt.current) {
-      tilt.current.scale.setScalar(sc.current)
-      tilt.current.rotation.y += (pointer.x * .25 - tilt.current.rotation.y) * k
-      tilt.current.rotation.x += (-pointer.y * .2 - tilt.current.rotation.x) * k
-    }
-    if (sheen.current) sheen.current.rotation.z = pointer.x * .8 + clock.elapsedTime * .15
+    if (sheen.current) sheen.current.rotation.z = clock.elapsedTime * .15
   })
 
   const a = progress * Math.PI * 2
   return (
-    <group ref={tilt} onPointerOver={() => (hover.current = true)} onPointerOut={() => (hover.current = false)}>
+    <group>
       <group ref={spin}>
         <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[2.2, 2.2, .05, 96]} /><meshStandardMaterial color="#070707" roughness={.5} /></mesh>
         <mesh position={[0, 0, .026]}><circleGeometry args={[2.2, 128]} /><meshStandardMaterial map={grooves} metalness={.35} roughness={.45} /></mesh>
