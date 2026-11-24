@@ -131,34 +131,38 @@ export default function Songs() {
   return (
     <div className="page" style={{ overflow: 'hidden' }}>
       <style>{`
-        .vw{position:relative;width:min(440px,100%);aspect-ratio:1;cursor:pointer;margin:0 auto}
-        @media(max-width:860px){.vw{width:min(340px,88vw)}}
+        .vw-wrap{position:relative;overflow:hidden;display:flex;align-items:center;min-height:520px}
+        .vw{position:relative;width:680px;height:680px;flex-shrink:0;margin-left:-240px;cursor:pointer}
+        @media(max-width:860px){.vw-wrap{min-height:0}.vw{width:min(340px,88vw);height:auto;aspect-ratio:1;margin:0 auto}}
         .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s;font-size:18px}
         .pl-btn:hover{color:var(--pink);transform:scale(1.12)}
         .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s;font-size:22px}
         .pl-play:hover{background:var(--pink);color:#fff}
       `}</style>
 
-      <div className="split" style={{ alignItems: 'center' }}>
-        {/* VINYLE 3D - taille normale, cover trouée + rotation + animation changement */}
-        <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'} style={{ position: 'relative' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={cur.id}
-              initial={{ opacity: 0, scale: 0.85, rotate: -30 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 1.08, rotate: 30 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              style={{ position: 'absolute', inset: 0 }}
-            >
-              <Suspense fallback={null}>
-                <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
-              </Suspense>
-            </motion.div>
-          </AnimatePresence>
+      <div className="split" style={{ alignItems: 'center', position: 'relative' }}>
+        {/* COLONNE VINYLE - coupée à gauche, ne touche jamais le texte */}
+        <div className="vw-wrap">
+          <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={cur.id}
+                initial={{ opacity: 0, scale: 0.85, rotate: -30 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.08, rotate: 30 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                style={{ position: 'absolute', inset: 0 }}
+              >
+                <Suspense fallback={null}>
+                  <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
+                </Suspense>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div>
+        {/* COLONNE TEXTE - toujours au-dessus, jamais recouverte */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
           <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
 
           <div style={{ margin: '28px 0 8px' }}>
