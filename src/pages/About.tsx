@@ -22,9 +22,9 @@ export default function About() {
   return (
     <div
       className="page"
-      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '70px 0 8px', display: 'flex', flexDirection: 'column' }}
+      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
-      <p className="mono" style={{ paddingLeft: '2vw' }}>03 — À propos</p>
+      <p className="mono">03 — À propos</p>
 
       {/* Zone centrée : le livret s'adapte à la hauteur de l'écran pour tout tenir sans scroll */}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -38,8 +38,8 @@ export default function About() {
           style={{
             position: 'relative',
             aspectRatio: '16/9',
-            // JOURNAL ENCORE PLUS GRAND : 1800px, 100% de largeur, presque toute la hauteur
-            width: 'min(1800px, 100%, calc((100dvh - 110px) * 16 / 9))',
+            // LIVRET PLUS GROS : 1400px au lieu de 1100px, et presque toute la largeur / hauteur
+            width: 'min(1400px, 98%, calc((100dvh - 160px) * 16 / 9))',
             cursor: 'pointer',
           }}
         >
@@ -65,7 +65,7 @@ export default function About() {
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(1) contrast(1.15)' }}
               />
             </motion.div>
-            <div style={{ background: '#171717', color: '#ddd', padding: '8%', fontSize: 'clamp(13px,1.6vw,20px)', lineHeight: 1.6 }}>
+            <div style={{ background: '#171717', color: '#ddd', padding: '8%', fontSize: 'clamp(11px,1.4vw,17px)', lineHeight: 1.6 }}>
               {lines.map((l, k) => (
                 <motion.p
                   key={k}
@@ -73,7 +73,7 @@ export default function About() {
                   initial={false}
                   animate={{ opacity: open ? 1 : 0, y: open ? 0 : 10 }}
                   transition={{ delay: 1 + k * 0.2 }}
-                  style={{ marginBottom: 16 }}
+                  style={{ marginBottom: 14 }}
                 >
                   {l}
                 </motion.p>
@@ -82,7 +82,7 @@ export default function About() {
           </motion.div>
         </div>
 
-        <p className="mono" style={{ textAlign: 'center', marginTop: 3 }}>
+        <p className="mono" style={{ textAlign: 'center', marginTop: 12 }}>
           {open ? 'Cliquer pour refermer' : 'Cliquer pour ouvrir le livret'}
         </p>
       </div>
