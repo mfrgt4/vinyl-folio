@@ -24,7 +24,6 @@ export default function About() {
       className="page"
       style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
-
       {/* Zone centrée : le livret s'adapte à la hauteur de l'écran pour tout tenir sans scroll */}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <div
@@ -37,7 +36,6 @@ export default function About() {
           style={{
             position: 'relative',
             aspectRatio: '16/9',
-            // LIVRET PLUS GROS : 1400px au lieu de 1100px, et presque toute la largeur / hauteur
             width: 'min(1400px, 98%, calc((100dvh - 160px) * 16 / 9))',
             cursor: 'pointer',
           }}
@@ -45,6 +43,20 @@ export default function About() {
           <Suspense fallback={null}>
             <div style={{ position: 'absolute', inset: 0 }}><Booklet open={open} /></div>
           </Suspense>
+
+          {/* PAGE DE GARDE - GIF QUAND LE LIVRET EST FERMÉ */}
+          <motion.div
+            initial={false}
+            animate={{ opacity: open ? 0 : 1 }}
+            transition={{ duration: 0.4 }}
+            style={{ position: 'absolute', left: '24.5%', top: '20.5%', width: '51%', height: '59%', pointerEvents: 'none', overflow: 'hidden' }}
+          >
+            <img
+              src="/images/couverture.gif"
+              alt="Couverture du livret"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </motion.div>
 
           <motion.div
             initial={false}
