@@ -168,7 +168,7 @@ export default function Submit() {
             <img src={coverPreview} alt="" style={{ width: 150, height: 150, objectFit: "cover", borderRadius: 8 }} />
           ) : (
             <div style={{ position: "relative", width: 150, height: 150, borderRadius: "50%", background: "repeating-radial-gradient(#111 0 2px,#222 3px 4px)", animation: "spin 4s linear infinite", flexShrink: 0 }}>
-              <div style={{ position: "absolute", inset: "36%", borderRadius: "50%", background: "var(--red)" }} />
+              <div style={{ position: "absolute", inset: "36%", borderRadius: "50%", background: "var(--pink)" }} />
             </div>
           )}
           <div>

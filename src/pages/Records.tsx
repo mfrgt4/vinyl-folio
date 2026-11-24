@@ -53,7 +53,7 @@ function Disc({ spinning, hover, color }: { spinning: boolean; hover: boolean; c
           boxShadow: '0 10px 24px -12px #000a',
         }}
       >
-        {/* MILIEU DU VINYLE = couleur du vinyle, pas du rouge en dur */}
+        {/* MILIEU DU VINYLE = couleur du vinyle, pas du rose en dur */}
         <div style={{ position: 'absolute', inset: '36%', borderRadius: '50%', background: color }}>
           <div style={{ position: 'absolute', top: '10%', left: '46%', width: '8%', height: '8%', borderRadius: '50%', background: '#E8E7E2' }} />
         </div>
@@ -196,7 +196,7 @@ export default function Records() {
       <AnimatePresence mode="wait">
         <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)', margin: 0 }}>{cur.title}</h2>
-          <p className="mono" style={{ color: 'var(--red)', margin: 0 }}>{cur.cat} / {cur.year}</p>
+          <p className="mono" style={{ color: 'var(--pink)', margin: 0 }}>{cur.cat} / {cur.year}</p>
         </motion.div>
       </AnimatePresence>
 

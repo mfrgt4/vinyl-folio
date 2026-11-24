@@ -101,7 +101,7 @@ export default function Community() {
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <p className="mono"></p>
         <p className="mono">
-          <span style={{ color: "var(--red)" }}>●</span> {online} en ligne
+          <span style={{ color: "var(--pink)" }}>●</span> {online} en ligne
         </p>
       </div>
       <h1 style={{ margin: "16px 0 32px" }}>COMMUNITY</h1>

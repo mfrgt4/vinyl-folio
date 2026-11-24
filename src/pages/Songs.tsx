@@ -22,7 +22,7 @@ function Eq({ on }: { on: boolean }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 2, height: 14, width: 13 }}>
       {[0, 1, 2].map(k => (
-        <motion.i key={k} style={{ width: 3, background: 'var(--red)', display: 'block', height: '30%' }} animate={{ height: on ? ['30%', '100%', '45%', '85%', '30%'] : '30%' }} transition={on ? { duration: 1 + k * 0.25, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.4 }} />
+        <motion.i key={k} style={{ width: 3, background: 'var(--pink)', display: 'block', height: '30%' }} animate={{ height: on ? ['30%', '100%', '45%', '85%', '30%'] : '30%' }} transition={on ? { duration: 1 + k * 0.25, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.4 }} />
       ))}
     </span>
   )
@@ -41,7 +41,7 @@ function Wave({ id, progress, onSeek }: { id: string; progress: number; onSeek: 
       onKeyDown={e => { if (e.key === 'ArrowRight') onSeek(Math.min(1, progress + 0.03)); if (e.key === 'ArrowLeft') onSeek(Math.max(0, progress - 0.03)) }}
       style={{ display: 'flex', alignItems: 'center', gap: 2, height: 52, cursor: 'pointer', touchAction: 'none' }}>
       {bars.map((h, k) => (
-        <span key={k} style={{ flex: 1, height: `${h * 100}%`, borderRadius: 1, background: k / BARS < progress ? 'var(--red)' : 'var(--line)', transition: 'background .25s' }} />
+        <span key={k} style={{ flex: 1, height: `${h * 100}%`, borderRadius: 1, background: k / BARS < progress ? 'var(--pink)' : 'var(--line)', transition: 'background .25s' }} />
       ))}
     </motion.div>
   )
@@ -134,9 +134,9 @@ export default function Songs() {
         .vw{position:relative;width:calc(100% + 18vw);margin-left:-18vw;aspect-ratio:1;cursor:pointer}
         @media(max-width:860px){.vw{width:calc(100% + 10vw);margin-left:-10vw}}
         .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s;font-size:18px}
-        .pl-btn:hover{color:var(--red);transform:scale(1.12)}
+        .pl-btn:hover{color:var(--pink);transform:scale(1.12)}
         .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s;font-size:22px}
-        .pl-play:hover{background:var(--red);color:#fff}
+        .pl-play:hover{background:var(--pink);color:#fff}
       `}</style>
 
       <div className="split" style={{ alignItems: 'center' }}>
@@ -162,7 +162,7 @@ export default function Songs() {
           <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
 
           <div style={{ margin: '28px 0 8px' }}>
-            <p className="mono" style={{ color: 'var(--red)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <p className="mono" style={{ color: 'var(--pink)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Eq on={playing} /> {playing ? 'En lecture' : 'En pause'} · {String(safeI + 1).padStart(2, '0')}/{String(list.length).padStart(2, '0')}
             </p>
             <AnimatePresence mode="wait">
@@ -185,12 +185,12 @@ export default function Songs() {
             <button className="pl-btn" aria-label="Suivant" onClick={() => go(1)}>⏭</button>
           </div>
 
-          <p className="mono" style={{ color: 'var(--red)', margin: '36px 0 4px' }}>Les 4 dernières</p>
+          <p className="mono" style={{ color: 'var(--pink)', margin: '36px 0 4px' }}>Les 4 dernières</p>
           {last4.map((s) => {
             const k = list.findIndex(x => x.id === s.id)
             return (
               <button key={s.id} className={'track' + (k === safeI ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
-                {k === safeI && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
+                {k === safeI && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--pink)' }} />}
                 <span className="mono">{k === safeI ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
                 <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 <span>
