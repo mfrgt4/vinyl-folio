@@ -1,14 +1,14 @@
-:root{--bg:#E8E7E2;--paper:#F5F4F0;--ink:#171717;--grey:#777671;--line:#D2D1CC;--pink:#BF2158;--pink-dark:#C46A8A}
+:root{--bg:#E8E7E2;--paper:#F5F4F0;--ink:#171717;--grey:#777671;--line:#D2D1CC;--pink:#BF2158;--pink-dark:#8A1740}
 *{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--ink);font:300 16px/1.6 Inter,sans-serif}
 a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey)}
 h1,h2{font-family:Archivo,sans-serif;font-stretch:75%;font-weight:800;line-height:.88;letter-spacing:-.03em;text-transform:uppercase}
 h1{font-size:clamp(56px,13vw,200px)}h2{font-size:clamp(40px,8vw,110px)}
-.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;mix-blend-mode:difference;color:#fff}
+.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;color:var(--ink)}
 .nav nav{display:flex;gap:28px}.nav a{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;position:relative}
-.nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--pink)}
+.nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:2px;background:#BF2158}
 .burger{display:none}
-@media(max-width:860px){.burger{display:block}.nav nav{position:fixed;inset:0;background:var(--ink);flex-direction:column;justify-content:center;align-items:center;font-size:24px;transform:translateY(-100%);transition:transform .7s cubic-bezier(.7,0,.2,1)}.nav nav.open{transform:none}}
+@media(max-width:860px){.burger{display:block}.nav nav{position:fixed;inset:0;background:var(--ink);color:var(--paper);flex-direction:column;justify-content:center;align-items:center;font-size:24px;transform:translateY(-100%);transition:transform .7s cubic-bezier(.7,0,.2,1)}.nav nav.open{transform:none}}
 .page{min-height:100vh;padding:120px 4vw 60px}
 .hero{height:100vh;margin:-120px -4vw 0;background:#171717;color:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;text-align:center}
 .hero canvas{position:absolute!important;inset:0}.hero>*:not(canvas){position:relative}
