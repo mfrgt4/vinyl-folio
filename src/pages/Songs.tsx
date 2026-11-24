@@ -2,13 +2,12 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useLS } from '../hooks'
-import { SONGS, Song } from '../data'
+import { Song } from '../data'
 const Vinyl3D = lazy(() => import('../three/Vinyl3D'))
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 const BARS = 72
 
-/** Forme d'onde décorative, stable pour chaque morceau (générée à partir de son id) */
 function waveform(id: string) {
   let h = 7
   for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
@@ -19,7 +18,6 @@ function waveform(id: string) {
   })
 }
 
-/** Petit égaliseur animé : s'anime pendant la lecture */
 function Eq({ on }: { on: boolean }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 2, height: 14, width: 13 }}>
@@ -35,7 +33,6 @@ function Eq({ on }: { on: boolean }) {
   )
 }
 
-/** Barre de progression en forme d'onde : cliquable, glissable et accessible au clavier */
 function Wave({ id, progress, onSeek }: { id: string; progress: number; onSeek: (r: number) => void }) {
   const bars = useMemo(() => waveform(id), [id])
   const seek = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -87,7 +84,10 @@ const PAUSE = 'M6 5h4v14H6zM14 5h4v14h-4z'
 
 export default function Songs() {
   const [saved] = useLS<Song[]>('vf-songs', [])
-  const list = [...SONGS, ...saved] // toutes les musiques pour le lecteur
+  const list: Song[] = useMemo(
+    () => [...(saved ?? [])].sort((a, b) => (b.date ?? 0) - (a.date ?? 0)),
+    [saved]
+  )
   const [i, setI] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [t, setT] = useState(0)
@@ -95,14 +95,15 @@ export default function Songs() {
   const [allOpen, setAllOpen] = useState(false)
   const [query, setQuery] = useState('')
   const a = useRef<HTMLAudioElement>(null)
-  const cur = list[i]
+
+  // On sécurise l'index : jamais hors de la liste
+  const safeI = list.length ? Math.min(i, list.length - 1) : 0
+  const cur: Song | undefined = list[safeI]
   const progress = dur ? Math.min(1, t / dur) : 0
 
-  // QUE LES 4 DERNIÈRES SUR LA PAGE (les propositions ajoutées sont les plus récentes)
-  const last4 = list.slice(-4)
+  const last4 = list.slice(0, 4)
 
-  // DANS LE MENU "TOUTES" : que les propositions ajoutées via le formulaire, avec recherche
-  const filtered = saved.filter(s =>
+  const filtered = list.filter(s =>
     (s.title + ' ' + s.artist).toLowerCase().includes(query.toLowerCase())
   )
   const chooseFromAll = (id: string) => {
@@ -112,16 +113,32 @@ export default function Songs() {
     setQuery('')
   }
 
-  useEffect(() => { setT(0); setDur(0) }, [i])
+  useEffect(() => { setT(0); setDur(0) }, [safeI])
   useEffect(() => {
     const el = a.current
     if (!el) return
-    if (playing && cur.src) el.play().catch(() => setPlaying(false))
+    if (playing && cur?.src) el.play().catch(() => setPlaying(false))
     else el.pause()
-  }, [playing, i])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, safeI, cur?.src])
 
-  const go = (d: number) => { setI((i + d + list.length) % list.length); setPlaying(true) }
+  const go = (d: number) => {
+    if (!list.length) return
+    setI((prev) => (prev + d + list.length) % list.length)
+    setPlaying(true)
+  }
   const seek = (r: number) => { if (a.current && dur) a.current.currentTime = r * dur }
+
+  if (!list.length || !cur) {
+    return (
+      <div className="page">
+        <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
+        <p className="mono" style={{ margin: '24px 0' }}>Aucune proposition pour l'instant.</p>
+        <p style={{ opacity: .7, marginBottom: 24 }}>Sois la première à proposer une musique, elle apparaîtra ici.</p>
+        <Link className="btn" to="/ajouter">Proposer une chanson</Link>
+      </div>
+    )
+  }
 
   return (
     <div className="page" style={{ overflow: 'hidden' }}>
@@ -135,20 +152,18 @@ export default function Songs() {
       `}</style>
 
       <div className="split" style={{ alignItems: 'center' }}>
-        {/* Vinyle */}
         <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
           <Suspense fallback={null}>
-            <Vinyl3D playing={playing} kick={i} color={cur.color} title={cur.title} num={i + 1} progress={progress} cover={cur.cover} />
+            <Vinyl3D playing={playing} kick={safeI} color={cur.color} title={cur.title} num={safeI + 1} progress={progress} cover={cur.cover} />
           </Suspense>
         </div>
 
         <div>
           <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
 
-          {/* Morceau en cours */}
           <div style={{ margin: '28px 0 8px' }}>
             <p className="mono" style={{ color: 'var(--red)', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Eq on={playing} /> {playing ? 'En lecture' : 'En pause'} · {String(i + 1).padStart(2, '0')}/{String(list.length).padStart(2, '0')}
+              <Eq on={playing} /> {playing ? 'En lecture' : 'En pause'} · {String(safeI + 1).padStart(2, '0')}/{String(list.length).padStart(2, '0')}
             </p>
             <AnimatePresence mode="wait">
               <motion.div key={cur.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
@@ -160,7 +175,6 @@ export default function Songs() {
 
           <audio ref={a} src={cur.src} onTimeUpdate={e => setT(e.currentTarget.currentTime)} onLoadedMetadata={e => setDur(e.currentTarget.duration)} onEnded={() => go(1)} />
 
-          {/* Lecteur */}
           <Wave id={cur.id} progress={progress} onSeek={seek} />
           <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 14px' }}>
             <span>{fmt(t)}</span><span>{dur ? fmt(dur) : cur.dur}</span>
@@ -179,14 +193,13 @@ export default function Songs() {
             {cur.link && <a className="mono" style={{ marginLeft: 'auto' }} href={cur.link} target="_blank" rel="noreferrer">Écouter sur la plateforme ↗</a>}
           </div>
 
-          {/* File d'attente - QUE LES 4 DERNIÈRES */}
           <p className="mono" style={{ color: 'var(--red)', margin: '36px 0 4px' }}>Les 4 dernières</p>
           {last4.map((s) => {
             const k = list.findIndex(x => x.id === s.id)
             return (
-              <button key={s.id} className={'track' + (k === i ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
-                {k === i && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
-                <span className="mono">{k === i ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
+              <button key={s.id} className={'track' + (k === safeI ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
+                {k === safeI && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
+                <span className="mono">{k === safeI ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
                 <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 <span>
                   <b style={{ fontWeight: 500 }}>{s.title}</b><br />
@@ -197,16 +210,14 @@ export default function Songs() {
             )
           })}
 
-          {/* BOUTON AFFICHER TOUTES LES PROPOSITIONS */}
           <button className="btn" style={{ marginTop: 24, width: '100%' }} onClick={() => setAllOpen(true)}>
-            Afficher toutes les propositions ({saved.length})
+            Afficher toutes les propositions ({list.length})
           </button>
 
           <Link className="btn" style={{ marginTop: 12 }} to="/ajouter">Proposer une chanson</Link>
         </div>
       </div>
 
-      {/* MENU "TOUTES LES PROPOSITIONS" - comme la recherche, sobre */}
       <AnimatePresence>
         {allOpen && (
           <motion.div
