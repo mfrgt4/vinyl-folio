@@ -1,4 +1,5 @@
 :root{--bg:#E8E7E2;--paper:#F5F4F0;--ink:#171717;--grey:#777671;--line:#D2D1CC;--red:#873B43}
+html{background:#171717}
 *{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--ink);font:300 16px/1.6 Inter,sans-serif}
 a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey)}
@@ -10,7 +11,7 @@ h1{font-size:clamp(56px,13vw,200px)}h2{font-size:clamp(40px,8vw,110px)}
 .burger{display:none}
 @media(max-width:860px){.burger{display:block}.nav nav{position:fixed;inset:0;background:var(--ink);flex-direction:column;justify-content:center;align-items:center;font-size:24px;transform:translateY(-100%);transition:transform .7s cubic-bezier(.7,0,.2,1)}.nav nav.open{transform:none}}
 .page{min-height:100vh;padding:120px 4vw 60px}
-.hero{height:100vh;margin:-120px -4vw 0;background:#171717;color:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;text-align:center}
+.hero{height:100svh;min-height:100svh;margin:-120px -4vw 0;background:#171717;color:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;text-align:center}
 .hero canvas{position:absolute!important;inset:0}.hero>*:not(canvas){position:relative}
 .btn{display:inline-block;border:1px solid currentColor;padding:12px 24px;border-radius:99px;font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;transition:.4s}
 .btn:hover{background:var(--red);border-color:var(--red);color:#fff;transform:translateY(-3px)}
