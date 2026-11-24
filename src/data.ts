@@ -7,7 +7,7 @@ const S = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-'
 
 // "cat" = artistes · "tools" = genres · "cover" = image dans public/covers/ (facultatif)
 export const VINYLS: Vinyl[] = [
- {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#873B43',cover:'/covers/Know-My-Name.jpg',
+ {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#873B43',cover:'/covers/Know-My-Name.jpeg',
   desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent, entre énergie pop et groove R&B. Ce que j’aime ici, c’est le contraste des voix et l’impression d’une vraie rencontre plutôt que d’un simple featuring. À écouter fort.',
   tools:['K-pop','R&B']},
  {id:'v2',title:'Titre 2',cat:'Artiste 2',year:2025,color:'#171717',desc:'Votre texte.',tools:['Pop']},
