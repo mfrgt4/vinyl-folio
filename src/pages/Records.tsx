@@ -100,15 +100,19 @@ export default function Records() {
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setSearchOpen(false); setOpen(false); return }
+      // RECHERCHE OUVERTE : les flèches ne changent plus les vinyles derrière
+      if (searchOpen || open) return
       if (e.key === 'ArrowRight') go(1)
       if (e.key === 'ArrowLeft') go(-1)
-      if (e.key === 'Escape') { setSearchOpen(false); setOpen(false) }
     }
     addEventListener('keydown', k)
     return () => removeEventListener('keydown', k)
-  }, [])
+  }, [searchOpen, open])
 
   const onWheel = (e: React.WheelEvent) => {
+    // RECHERCHE OUVERTE : on ne change plus de vinyle derrière
+    if (searchOpen || open) return
     const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
     if (lock.current || Math.abs(d) < 30) return
     lock.current = true
@@ -129,6 +133,8 @@ export default function Records() {
       onWheel={onWheel}
       onTouchStart={e => (touchX.current = e.touches[0].clientX)}
       onTouchEnd={e => {
+        // RECHERCHE OUVERTE : le swipe ne change plus les vinyles derrière
+        if (searchOpen || open) return
         const dx = e.changedTouches[0].clientX - touchX.current
         if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1)
       }}
@@ -212,11 +218,16 @@ export default function Records() {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setSearchOpen(false)}
+            // LE SCROLL DANS LA RECHERCHE NE TRAVERSE PLUS VERS LES VINYLES
+            onWheel={e => e.stopPropagation()}
+            onTouchMove={e => e.stopPropagation()}
             style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(23,23,23,.25)', display: 'grid', placeItems: 'center', padding: 24 }}
           >
             <motion.div
               initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}
               onClick={e => e.stopPropagation()}
+              onWheel={e => e.stopPropagation()}
+              onTouchMove={e => e.stopPropagation()}
               style={{ width: '100%', maxWidth: 520, maxHeight: '80dvh', overflow: 'auto', background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--ink)', padding: '28px 28px 12px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
