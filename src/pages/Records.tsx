@@ -136,14 +136,14 @@ export default function Records() {
     >
       <audio ref={a} src={cur.audio} onEnded={() => setPlaying(false)} />
 
-      {/* BOUTON LOUPE - en haut à droite */}
+      {/* BOUTON RECHERCHE SOBRE - texte seul, pas de SVG, pas d'emoji */}
       <button
         className="mono"
         onClick={() => setSearchOpen(true)}
         aria-label="Rechercher une musique"
-        style={{ position: 'absolute', top: 92, right: '4vw', zIndex: 20, width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--ink)', background: 'var(--paper)', cursor: 'pointer', fontSize: 18, display: 'grid', placeItems: 'center' }}
+        style={{ position: 'absolute', top: 96, right: '4vw', zIndex: 20, background: 'none', border: 0, cursor: 'pointer', opacity: .7, padding: 0 }}
       >
-        🔍
+        Rechercher →
       </button>
 
       <div className="stage" style={{ flex: 1, minHeight: 0, height: 'auto', marginTop: 0 }}>
@@ -206,43 +206,42 @@ export default function Records() {
         <button className="mono" onClick={() => go(1)}>Suiv. →</button>
       </div>
 
-      {/* MENU RECHERCHE - par-dessus la page */}
+      {/* MENU RECHERCHE SOBRE - fond clair, lignes fines */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setSearchOpen(false)}
-            style={{ position: 'fixed', inset: 0, zIndex: 90, background: '#171717ee', color: 'var(--paper)', display: 'grid', placeItems: 'center', padding: 24 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(23,23,23,.25)', display: 'grid', placeItems: 'center', padding: 24 }}
           >
             <motion.div
-              initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}
+              initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              style={{ width: '100%', maxWidth: 560, maxHeight: '80dvh', overflow: 'auto', background: '#1c1c1c', borderRadius: 16, padding: 24 }}
+              style={{ width: '100%', maxWidth: 520, maxHeight: '80dvh', overflow: 'auto', background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--ink)', padding: '28px 28px 12px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p className="mono">Rechercher une musique</p>
-                <button className="mono" onClick={() => setSearchOpen(false)}>✕ Fermer</button>
+                <p className="mono" style={{ margin: 0 }}>Rechercher</p>
+                <button className="mono" onClick={() => setSearchOpen(false)} style={{ background: 'none', border: 0, cursor: 'pointer', padding: 0 }}>Fermer</button>
               </div>
               <input
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Titre ou artiste…"
-                style={{ width: '100%', margin: '20px 0', padding: '12px 0', background: 'none', border: 0, borderBottom: '1px solid var(--paper)', color: 'var(--paper)', font: '300 20px Inter', outline: 0 }}
+                style={{ width: '100%', margin: '20px 0 8px', padding: '10px 0', background: 'none', border: 0, borderBottom: '1px solid var(--ink)', color: 'var(--ink)', font: '300 18px Inter', outline: 0 }}
               />
-              {results.length === 0 && <p className="mono">Aucun résultat.</p>}
-              {results.map(v => (
+              {results.length === 0 && <p className="mono" style={{ padding: '16px 0' }}>Aucun résultat.</p>}
+              {results.map((v, k) => (
                 <button
                   key={v.id}
                   onClick={() => choose(v.id)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 16, padding: '14px 0', background: 'none', border: 0, borderBottom: '1px solid #333', color: 'var(--paper)', textAlign: 'left', cursor: 'pointer' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'baseline', gap: 16, padding: '16px 0', background: 'none', border: 0, borderBottom: '1px solid #d8d7d2', color: 'var(--ink)', textAlign: 'left', cursor: 'pointer' }}
                 >
-                  <span style={{ width: 44, height: 44, borderRadius: '50%', background: v.color, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 12 }}>●</span>
+                  <span className="mono" style={{ opacity: .5 }}>{String(k + 1).padStart(2, '0')}</span>
                   <span style={{ flex: 1 }}>
-                    <span style={{ display: 'block', fontSize: 18 }}>{v.title}</span>
-                    <span className="mono" style={{ opacity: .7 }}>{v.cat} — {v.year}</span>
+                    <span style={{ display: 'block', fontSize: 17 }}>{v.title}</span>
+                    <span className="mono" style={{ opacity: .6 }}>{v.cat} — {v.year}</span>
                   </span>
-                  <span className="mono">→</span>
                 </button>
               ))}
             </motion.div>
