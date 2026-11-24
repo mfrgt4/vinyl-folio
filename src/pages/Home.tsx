@@ -120,7 +120,7 @@ export default function Home() {
         <div>
           {Array(8)
             .fill(
-              " 【entity-Figma¦canonical_name=Figma】 — Three.js — Vinyle — Swiss Design — Label — ",
+              " MMusique — Vinyle — Disque — Son — Playlist — Rythme — ",
             )
             .join("")}
         </div>
