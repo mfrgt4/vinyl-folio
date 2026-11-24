@@ -141,9 +141,9 @@ export default function Records() {
         className="mono"
         onClick={() => setSearchOpen(true)}
         aria-label="Rechercher une musique"
-        style={{ position: 'absolute', top: 96, right: '4vw', zIndex: 20, background: 'none', border: 0, cursor: 'pointer', opacity: .7, padding: 0 }}
+        style={{ position: 'absolute', top: 96, left: '4vw', zIndex: 20, background: 'none', border: 0, cursor: 'pointer', opacity: .7, padding: 0}}
       >
-        Rechercher →
+        Rechercher ⌕
       </button>
 
       <div className="stage" style={{ flex: 1, minHeight: 0, height: 'auto', marginTop: 0 }}>
