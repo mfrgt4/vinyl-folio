@@ -82,7 +82,7 @@ export default function About() {
           </motion.div>
         </div>
 
-        <p className="mono" style={{ textAlign: 'center', marginTop: 8 }}>
+        <p className="mono" style={{ textAlign: 'center', marginTop: 3 }}>
           {open ? 'Cliquer pour refermer' : 'Cliquer pour ouvrir le livret'}
         </p>
       </div>
