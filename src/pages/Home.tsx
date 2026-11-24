@@ -21,7 +21,7 @@ export default function Home() {
         <p className="mono" style={{color:'#fff',marginBottom:20}}>Plateforme musicale personnelle & collaborative</p>
         <h1 aria-label="Vinyl Folio">{'VINYL FOLIO'.split('').map((c,i)=><motion.span key={i} style={{display:'inline-block',whiteSpace:'pre'}} initial={{y:'110%',opacity:0}} animate={{y:0,opacity:1}} transition={{delay:.4+i*.04,duration:.8,ease:[.2,.8,.2,1]}}>{c}</motion.span>)}</h1>
         <div style={{display:'flex',gap:16,marginTop:32}}><Link className="btn" to="/mes-musiques">Mes Musiques</Link><Link className="btn" to="/ajouter">Ajouter une musique</Link></div>
-      </motion.div>
+      </div>
     </section>
     <section className="split" style={{padding:'120px 0'}}>
       <motion.h2 initial={{opacity:0,x:-60}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:.9}}>Un univers,<br/>des disques.</motion.h2>
@@ -32,7 +32,7 @@ export default function Home() {
 
     {/* BANDEAU PLEINE LARGEUR */}
     <div className="marquee" aria-hidden style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', overflow: 'hidden' }}>
-      <div>{Array(8).fill('【entity-Figma¦canonical_name=Figma】 — Three.js — Vinyle — Swiss Design — Label — ').join('')}</div>
+      <div>{Array(8).fill(' 【entity-Figma¦canonical_name=Figma】 — Three.js — Vinyle — Swiss Design — Label — ').join('')}</div>
     </div>
 
     <section style={{background:'var(--ink)',color:'var(--paper)',margin:'80px -4vw -60px',padding:'100px 4vw'}}>
