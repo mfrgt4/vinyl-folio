@@ -87,9 +87,7 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
         >
-          Un univers,
-          <br />
-          des disques.
+          Un univers.
         </motion.h2>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
