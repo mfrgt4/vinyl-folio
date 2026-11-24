@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLS } from "../hooks";
 import { CATS, THREADS, Thread } from "../data";
+import { supabase } from "../supabase";
+
 const line: React.CSSProperties = {
   flex: 1,
   background: "none",
@@ -10,6 +12,7 @@ const line: React.CSSProperties = {
   font: "300 20px Inter",
   outline: 0,
 };
+
 export default function Community() {
   const [threads, setThreads] = useLS<Thread[]>("vf-threads", THREADS);
   const [cat, setCat] = useState("All");
@@ -17,8 +20,32 @@ export default function Community() {
   const [msg, setMsg] = useState("");
   const [title, setTitle] = useState("");
   const [typing, setTyping] = useState(false);
-  const [online] = useState(() => 12 + Math.floor(Math.random() * 20));
+  const [online, setOnline] = useState(1);
+
+  // VRAI NOMBRE DE PERSONNES EN LIGNE - Supabase Presence
+  useEffect(() => {
+    const channel = supabase.channel("online-users", {
+      config: { presence: { key: "user-" + Math.random().toString(36).slice(2) } },
+    });
+
+    channel
+      .on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState();
+        setOnline(Object.keys(state).length);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const t = threads.find((x) => x.id === openId);
+
   useEffect(() => {
     // BroadcastChannel : "temps réel" entre onglets du même navigateur
     const bc = new BroadcastChannel("vf");
@@ -26,6 +53,7 @@ export default function Community() {
       setThreads(JSON.parse(localStorage.getItem("vf-threads") || "[]"));
     return () => bc.close();
   }, []);
+
   const save = (n: Thread[]) => {
     setThreads(n);
     setTimeout(() => {
@@ -34,6 +62,7 @@ export default function Community() {
       b.close();
     }, 80);
   };
+
   const reply = () => {
     if (!msg.trim() || !t) return;
     const d = new Date().toLocaleDateString("fr").slice(0, 5);
@@ -48,6 +77,7 @@ export default function Community() {
     setTyping(true);
     setTimeout(() => setTyping(false), 1800);
   };
+
   const create = () => {
     if (!title.trim()) return;
     const id = "t" + Date.now();
@@ -65,9 +95,11 @@ export default function Community() {
     setTitle("");
     setOpenId(id);
   };
+
   return (
     <div className="page">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <p className="mono">05 — Community</p>
         <p className="mono">
           <span style={{ color: "var(--red)" }}>●</span> {online} en ligne
         </p>
