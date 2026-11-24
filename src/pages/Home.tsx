@@ -120,7 +120,7 @@ export default function Home() {
         <div>
           {Array(8)
             .fill(
-              " MMusique — Vinyle — Disque — Son — Playlist — Rythme — ",
+              " Musique — Vinyle — Disque — Son — Playlist — Rythme — ",
             )
             .join("")}
         </div>
