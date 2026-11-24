@@ -25,7 +25,13 @@ export const VINYLS: Vinyl[] = [
   audio:'/audios/Watch-Me.mp3',
   desc:'Un titre qui claque dès les premières secondes. Cette musique dégage un flow grâce à son refrain qui reste en tête. Ce que j’aime ici, c’est l’attitude et le côté show, comme si le morceau était pensé pour la scène.',
   tools:['K-pop','Pop', 'Electro']},
- {id:'v4',title:'Titre 4',cat:'Artiste 4',year:2023,color:'#D2D1CC',desc:'Votre texte.',tools:['Jazz']},
+
+ {id:'v4',title:'Loser',cat:'Tame Impala',year:2025,color:'#222',
+  cover:'/covers/Loser.jpeg',
+  audio:'/audios/Loser.mp3',
+  desc:'Un morceau qui plane et qui groove en même temps. Tame Impala crée une ambiance à la fois mélancolique et hypnotique. Ce que j’aime ici, c’est le contraste entre la douceur de la voix et la basse.',
+  tools:['Syth','Psychedelic Pop', 'Rock']},
+
  {id:'v5',title:'Titre 5',cat:'Artiste 5',year:2022,color:'#D2D1CC',desc:'Votre texte.',tools:['Electro']}]
 
 export const SONGS: Song[] = [
