@@ -2,14 +2,17 @@ import { lazy, Suspense } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 const Particles = lazy(() => import('../three/Particles'))
-const mobile = typeof window !== 'undefined' && window.innerWidth < 768 // pas de 3D sur mobile
+const mobile = typeof window !== 'undefined' && window.innerWidth < 768
 export default function Home() {
   const { scrollY } = useScroll(); const y = useTransform(scrollY, [0, 600], [0, 120]); const s = useTransform(scrollY, [0, 600], [1, 1.15])
   return (<div className="page">
     <section className="hero">
-      <motion.div style={{position:'absolute',inset:0,y,scale:s,background:'radial-gradient(circle at 50% 50%,#873B4344,#171717 60%)'}}/>
+      {/* IMAGE DE FOND */}
+      <motion.div style={{position:'absolute',inset:0,y,scale:s,backgroundImage:"url('/images/hero.jpg')",backgroundSize:'cover',backgroundPosition:'center'}}/>
+      {/* FILTRE SOMBRE + ROSE PAR-DESSUS */}
+      <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom, rgba(23,23,23,.55), rgba(23,23,23,.75)), radial-gradient(circle at 50% 50%, #ED9DB544, #171717 60%)'}}/>
       {!mobile && <Suspense fallback={null}><Particles/></Suspense>}
-      <p className="mono" style={{color:'#aaa',marginBottom:20}}>Plateforme musicale personnelle & collaborative</p>
+      <p className="mono" style={{color:'#fff',marginBottom:20}}>Plateforme musicale personnelle & collaborative</p>
       <h1 aria-label="Vinyl Folio">{'VINYL FOLIO'.split('').map((c,i)=><motion.span key={i} style={{display:'inline-block',whiteSpace:'pre'}} initial={{y:'110%',opacity:0}} animate={{y:0,opacity:1}} transition={{delay:.4+i*.04,duration:.8,ease:[.2,.8,.2,1]}}>{c}</motion.span>)}</h1>
       <div style={{display:'flex',gap:16,marginTop:32,marginBottom:48}}><Link className="btn" to="/mes-musiques">Mes Musiques</Link><Link className="btn" to="/ajouter">Ajouter une musique</Link></div>
     </section>
