@@ -131,17 +131,17 @@ export default function Songs() {
   return (
     <div className="page" style={{ overflow: 'hidden' }}>
       <style>{`
-        .vw-wrap{position:relative;overflow:hidden;display:flex;align-items:center;min-height:680px;margin-left:calc(-4vw);margin-right:calc(-4vw)}
-        .vw{position:relative;width:920px;height:920px;flex-shrink:0;margin-left:-460px;cursor:pointer}
-        @media(max-width:860px){.vw-wrap{min-height:0;margin-left:0;margin-right:0}.vw{width:min(340px,88vw);height:auto;aspect-ratio:1;margin:0 auto}}
+        .vw-wrap{position:relative;overflow:hidden;display:flex;align-items:center;min-height:680px;margin-left:calc(-4vw)}
+        .vw{position:relative;width:980px;height:980px;flex-shrink:0;margin-left:-280px;cursor:pointer}
+        @media(max-width:860px){.vw-wrap{min-height:0;margin-left:0}.vw{width:min(340px,88vw);height:auto;aspect-ratio:1;margin:0 auto}}
         .pl-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;transition:color .3s,transform .3s;font-size:18px}
         .pl-btn:hover{color:var(--pink);transform:scale(1.12)}
         .pl-play{width:64px;height:64px;background:var(--ink);color:var(--paper);transition:background .35s;font-size:22px}
         .pl-play:hover{background:var(--pink);color:#fff}
       `}</style>
 
-      <div className="split" style={{ alignItems: 'center', position: 'relative' }}>
-        {/* VINYLE GÉANT - collé au bord gauche, moitié dehors, ne touche jamais le texte */}
+      <div className="split" style={{ alignItems: 'center', position: 'relative', gridTemplateColumns: '1.05fr 0.95fr', gap: '24px' }}>
+        {/* VINYLE GÉANT - collé à gauche, rapproché à droite, ne touche jamais le texte */}
         <div className="vw-wrap">
           <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
             <AnimatePresence mode="wait">
@@ -161,9 +161,9 @@ export default function Songs() {
           </div>
         </div>
 
-        {/* TEXTE - toujours au-dessus, jamais recouvert */}
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <h1 style={{ fontSize: 'clamp(40px,7vw,104px)' }}>VOS<br />CHANSONS</h1>
+        {/* TEXTE - toujours au-dessus, jamais recouvert, jamais coupé à droite */}
+        <div style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
+          <h1 style={{ fontSize: 'clamp(40px,6vw,92px)', whiteSpace: 'nowrap' }}>VOS<br />CHANSONS</h1>
 
           <div style={{ margin: '28px 0 8px' }}>
             <p className="mono" style={{ color: 'var(--pink)', display: 'flex', alignItems: 'center', gap: 8 }}>
