@@ -109,6 +109,15 @@ export default function Songs() {
     })
   }, [rows])
 
+  // BLOQUE LE SCROLL DE LA PAGE DERRIÈRE QUAND "TOUTES LES PROPOSITIONS" EST OUVERT
+  useEffect(() => {
+    if (!allOpen) return
+    const b = document.body.style.overflow, h = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = b; document.documentElement.style.overflow = h }
+  }, [allOpen])
+
   const chooseFromAll = (id: string) => {
     const k = list.findIndex(s => s.id === id)
     if (k >= 0) { setI(k); setPlaying(true) }
@@ -232,8 +241,20 @@ export default function Songs() {
 
       <AnimatePresence>
         {allOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setAllOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(23,23,23,.25)', display: 'grid', placeItems: 'center', padding: 24 }}>
-            <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }} onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 520, maxHeight: '80dvh', overflow: 'auto', background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--ink)', padding: '28px 28px 12px' }}>
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setAllOpen(false)}
+            onWheel={e => e.stopPropagation()}
+            onTouchMove={e => e.stopPropagation()}
+            style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(23,23,23,.25)', display: 'grid', placeItems: 'center', padding: 24 }}
+          >
+            <motion.div
+              initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              onWheel={e => e.stopPropagation()}
+              onTouchMove={e => e.stopPropagation()}
+              style={{ width: '100%', maxWidth: 520, maxHeight: '80dvh', overflow: 'auto', overscrollBehavior: 'contain', background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--ink)', padding: '28px 28px 12px' }}
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p className="mono" style={{ margin: 0 }}>Toutes les propositions</p>
                 <button className="mono" onClick={() => setAllOpen(false)} style={{ background: 'none', border: 0, cursor: 'pointer', padding: 0 }}>Fermer</button>
