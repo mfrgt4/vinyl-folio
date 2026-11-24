@@ -148,7 +148,7 @@ export default function Submit() {
           </label>
 
           <label className="field">
-            <span className="mono">06 — Cover (facultatif)</span>
+            <span className="mono">06 — Cover</span>
             <input type="file" accept="image/*" onChange={onCover} style={{ padding: "10px 0", border: 0 }} />
             {err.cover && <span className="mono err">{err.cover}</span>}
             {coverPreview && (
