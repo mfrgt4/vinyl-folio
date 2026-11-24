@@ -32,7 +32,11 @@ export const VINYLS: Vinyl[] = [
   desc:'Un morceau qui plane et qui groove en même temps. Tame Impala crée une ambiance à la fois mélancolique et hypnotique. Ce que j’aime ici, c’est le contraste entre la douceur de la voix et la basse.',
   tools:['Syth','Psychedelic Pop', 'Rock']},
 
- {id:'v5',title:'Titre 5',cat:'Artiste 5',year:2022,color:'#D2D1CC',desc:'Votre texte.',tools:['Electro']}]
+ {id:'v5',title:'4 Minutes',cat:'Justin Timberlake, Madonna',year:2008,color:'#D2BA3E',
+  cover:'/covers/4-Minutes.jpeg',
+  audio:'/audios/4-Minutes.mp3',
+  desc:'Un morceau qui ne te laisse pas respirer. Ce que j’aime ici, c’est l’énergie et le rythme qui pousse à bouger, avec ce refrain qui te reste en tête toute la journée.',
+  tools:['Pop', 'R&B']}]
 
 export const SONGS: Song[] = [
  {id:'s1',title:'Borderline',artist:'Tame Impala',dur:'4:08',color:'#873B43',src:S+'1.mp3',status:'ok'},
