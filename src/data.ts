@@ -8,7 +8,7 @@ const S = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-'
 // "cat" = artistes · "tools" = genres
 // "cover" = image dans public/covers/ · "audio" = fichier dans public/audios/ (les deux sont facultatifs)
 export const VINYLS: Vinyl[] = [
- {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#9D5ACB',
+ {id:'v1',title:'Know My Name',cat:'SOYEON, Vic Mensa, Sofía Reyes, Coco Jones',year:2026,color:'#FFFFFF',
   cover:'/covers/Know-My-Name.jpeg',
   audio:'/audios/Know-My-Name.mp3',
   desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent avec énergie pop constante. Les artistes se répondent comme une vraie rencontre plutôt qu’un simple featuring.',
@@ -20,7 +20,7 @@ export const VINYLS: Vinyl[] = [
   desc:'Un riff qui te prend dès la première seconde. Ce que j’aime ici, c’est la tension et l’énergie brute.',
   tools:['Indie Rock','Garage Rock']},
 
- {id:'v3',title:'Watch Me',cat:'Sophie Powers, Mimi Webb',year:2026,color:'#9B0545',
+ {id:'v3',title:'Watch Me',cat:'Sophie Powers, Mimi Webb',year:2026,color:'#FFFFFF',
   cover:'/covers/Watch-Me.jpeg',
   audio:'/audios/Watch-Me.mp3',
   desc:'Un titre qui claque dès les premières secondes. Cette musique dégage un flow grâce à son refrain qui reste en tête. Ce que j’aime ici, c’est l’attitude et le côté show, comme si le morceau était pensé pour la scène.',
@@ -32,7 +32,7 @@ export const VINYLS: Vinyl[] = [
   desc:'Un morceau qui plane et qui groove en même temps. Tame Impala crée une ambiance à la fois mélancolique et hypnotique. Ce que j’aime ici, c’est le contraste entre la douceur de la voix et la basse.',
   tools:['Syth','Psychedelic Pop', 'Rock']},
 
- {id:'v5',title:'4 Minutes',cat:'Justin Timberlake, Madonna',year:2008,color:'#D2BA3E',
+ {id:'v5',title:'4 Minutes',cat:'Justin Timberlake, Madonna',year:2008,color:'#FFFFFF',
   cover:'/covers/4-Minutes.jpeg',
   audio:'/audios/4-Minutes.mp3',
   desc:'Un morceau qui ne te laisse pas respirer. Ce que j’aime ici, c’est l’énergie et le rythme qui pousse à bouger, avec ce refrain qui te reste en tête toute la journée.',
