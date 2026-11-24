@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLS } from "../hooks";
-import { CATS, THREADS, Thread } from "../data";
+import { CATS } from "../data";
 import { supabase } from "../supabase";
 
 const line: React.CSSProperties = {
@@ -13,13 +12,17 @@ const line: React.CSSProperties = {
   outline: 0,
 };
 
+type Thread = { id: string; title: string; author: string; cat: string; created_at: string };
+type Post = { id: string; thread_id: string; author: string; content: string; created_at: string };
+
 export default function Community() {
-  const [threads, setThreads] = useLS<Thread[]>("vf-threads", THREADS);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [cat, setCat] = useState("All");
   const [openId, setOpenId] = useState<string | null>(null);
   const [msg, setMsg] = useState("");
   const [title, setTitle] = useState("");
-  const [typing, setTyping] = useState(false);
+  const [pseudo, setPseudo] = useState("");
   const [online, setOnline] = useState(1);
 
   // VRAI NOMBRE DE PERSONNES EN LIGNE - Supabase Presence
@@ -27,74 +30,91 @@ export default function Community() {
     const channel = supabase.channel("online-users", {
       config: { presence: { key: "user-" + Math.random().toString(36).slice(2) } },
     });
-
     channel
       .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState();
-        setOnline(Object.keys(state).length);
+        setOnline(Object.keys(channel.presenceState()).length);
       })
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           await channel.track({ online_at: new Date().toISOString() });
         }
       });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
+
+  // CHARGER LES DISCUSSIONS DEPUIS SUPABASE + TEMPS RÉEL
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("threads")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setThreads(data as Thread[]);
+    };
+    load();
+
+    const ch = supabase
+      .channel("threads-live")
+      .on("postgres_changes" as any, { event: "INSERT", schema: "public", table: "threads" }, (p: any) => {
+        setThreads((prev) => [p.new, ...prev]);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  // CHARGER LES MESSAGES DE LA CONV OUVERTE + TEMPS RÉEL
+  useEffect(() => {
+    if (!openId) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from("thread_posts")
+        .select("*")
+        .eq("thread_id", openId)
+        .order("created_at", { ascending: true });
+      if (data) setPosts(data as Post[]);
+    };
+    load();
+
+    const ch = supabase
+      .channel("posts-live-" + openId)
+      .on("postgres_changes" as any,
+        { event: "INSERT", schema: "public", table: "thread_posts", filter: `thread_id=eq.${openId}` },
+        (p: any) => setPosts((prev) => [...prev, p.new])
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [openId]);
 
   const t = threads.find((x) => x.id === openId);
+  const filtered = threads.filter((x) => cat === "All" || x.cat === cat);
 
-  useEffect(() => {
-    // BroadcastChannel : "temps réel" entre onglets du même navigateur
-    const bc = new BroadcastChannel("vf");
-    bc.onmessage = () =>
-      setThreads(JSON.parse(localStorage.getItem("vf-threads") || "[]"));
-    return () => bc.close();
-  }, []);
-
-  const save = (n: Thread[]) => {
-    setThreads(n);
-    setTimeout(() => {
-      const b = new BroadcastChannel("vf");
-      b.postMessage(1);
-      b.close();
-    }, 80);
-  };
-
-  const reply = () => {
+  const reply = async () => {
     if (!msg.trim() || !t) return;
-    const d = new Date().toLocaleDateString("fr").slice(0, 5);
-    save(
-      threads.map((x) =>
-        x.id === t.id
-          ? { ...x, posts: [...x.posts, { a: "vous", t: msg, d }] }
-          : x,
-      ),
-    );
+    await supabase.from("thread_posts").insert({
+      thread_id: t.id,
+      author: pseudo.trim() || "vous",
+      content: msg.trim(),
+    });
     setMsg("");
-    setTyping(true);
-    setTimeout(() => setTyping(false), 1800);
   };
 
-  const create = () => {
+  const create = async () => {
     if (!title.trim()) return;
-    const id = "t" + Date.now();
-    save([
-      {
-        id,
-        title,
-        author: "vous",
+    const { data } = await supabase
+      .from("threads")
+      .insert({
+        title: title.trim(),
+        author: pseudo.trim() || "vous",
         cat: cat === "All" ? "General" : cat,
-        date: new Date().toISOString().slice(0, 10),
-        posts: [],
-      },
-      ...threads,
-    ]);
+      })
+      .select()
+      .single();
     setTitle("");
-    setOpenId(id);
+    if (data) setOpenId(data.id);
   };
+
+  const fmtDate = (d: string) =>
+    new Date(d).toLocaleDateString("fr", { day: "2-digit", month: "2-digit" });
 
   return (
     <div className="page">
@@ -105,6 +125,8 @@ export default function Community() {
         </p>
       </div>
       <h1 style={{ margin: "16px 0 32px" }}>COMMUNITY</h1>
+
+      {/* FILTRES - TOUJOURS VISIBLES, MÊME DANS UNE CONV */}
       <div style={{ marginBottom: 24 }}>
         {CATS.map((c) => (
           <button
@@ -116,106 +138,122 @@ export default function Community() {
           </button>
         ))}
       </div>
-      <AnimatePresence mode="wait">
-        {!t ? (
-          <motion.div
-            key="l"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {threads
-              .filter((x) => cat === "All" || x.cat === cat)
-              .map((x, k) => (
-                <motion.button
-                  layout
-                  key={x.id}
+
+      {/* PSEUDO - une fois pour toutes */}
+      <input
+        placeholder="Ton pseudo…"
+        value={pseudo}
+        onChange={(e) => setPseudo(e.target.value)}
+        style={{ ...line, maxWidth: 220, marginBottom: 24, fontSize: 16 }}
+      />
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, alignItems: "start" }}>
+        {/* MENU DES CONVS - TOUJOURS VISIBLE, MÊME QUAND UNE CONV EST OUVERTE */}
+        <div>
+          <AnimatePresence>
+            {filtered.map((x, k) => (
+              <motion.button
+                layout
+                key={x.id}
+                className="track"
+                style={{
+                  gridTemplateColumns: "40px 1fr auto",
+                  background: x.id === openId ? "var(--ink)" : "none",
+                  color: x.id === openId ? "var(--paper)" : "var(--ink)",
+                }}
+                onClick={() => setOpenId(x.id)}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: k * 0.03 }}
+              >
+                <span className="mono">{String(k + 1).padStart(2, "0")}</span>
+                <span style={{ fontSize: 20, textAlign: "left" }}>
+                  {x.title}
+                  <br />
+                  <span className="mono" style={{ opacity: 0.6 }}>
+                    {x.author} · {x.cat}
+                  </span>
+                </span>
+                <span className="mono">{fmtDate(x.created_at)}</span>
+              </motion.button>
+            ))}
+          </AnimatePresence>
+
+          {filtered.length === 0 && (
+            <p className="mono" style={{ padding: "16px 0" }}>
+              Aucune discussion pour l'instant. Sois la première à en créer une.
+            </p>
+          )}
+
+          <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+            <input
+              aria-label="Nouveau sujet"
+              placeholder="Nouvelle discussion…"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && create()}
+              style={line}
+            />
+            <button className="btn" onClick={create}>
+              Publier
+            </button>
+          </div>
+        </div>
+
+        {/* CONV OUVERTE - À DROITE, LE MENU RESTE À GAUCHE */}
+        <div>
+          {!t ? (
+            <p className="mono" style={{ paddingTop: 12, opacity: 0.6 }}>
+              ← Choisis une discussion à gauche pour voir les messages
+            </p>
+          ) : (
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <button className="mono" onClick={() => setOpenId(null)}>
+                ← Fermer
+              </button>
+              <h2 style={{ fontSize: "clamp(32px,6vw,56px)", margin: "16px 0" }}>
+                {t.title}
+              </h2>
+              {posts.length === 0 && (
+                <p className="mono" style={{ padding: "12px 0" }}>
+                  Aucun message pour l'instant. Sois la première à répondre.
+                </p>
+              )}
+              {posts.map((p, k) => (
+                <motion.div
+                  key={p.id}
                   className="track"
-                  style={{ gridTemplateColumns: "40px 1fr auto auto" }}
-                  onClick={() => setOpenId(x.id)}
+                  style={{ gridTemplateColumns: "80px 1fr 60px" }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: k * 0.05 }}
                 >
-                  <span className="mono">{String(k + 1).padStart(2, "0")}</span>
-                  <span style={{ fontSize: 20 }}>
-                    {x.title}
-                    <br />
-                    <span className="mono">
-                      {x.author} · {x.cat}
-                    </span>
-                  </span>
-                  <span className="mono">{x.posts.length} rép.</span>
-                  <span className="mono">{x.date}</span>
-                </motion.button>
+                  <span className="mono">{p.author}</span>
+                  <span>{p.content}</span>
+                  <span className="mono">{fmtDate(p.created_at)}</span>
+                </motion.div>
               ))}
-            <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
-              <input
-                aria-label="Nouveau sujet"
-                placeholder="Nouvelle discussion…"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                style={line}
-              />
-              <button className="btn" onClick={create}>
-                Publier
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="c"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            <button className="mono" onClick={() => setOpenId(null)}>
-              ← Index
-            </button>
-            <h2 style={{ fontSize: "clamp(32px,6vw,72px)", margin: "16px 0" }}>
-              {t.title}
-            </h2>
-            {t.posts.map((p, k) => (
-              <motion.div
-                key={k}
-                className="track"
-                style={{ gridTemplateColumns: "80px 1fr 60px" }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: k * 0.08 }}
-              >
-                <span className="mono">{p.a}</span>
-                <span>{p.t}</span>
-                <span className="mono">{p.d}</span>
-              </motion.div>
-            ))}
-            {typing && (
-              <p className="mono" aria-live="polite">
-                Quelqu’un écrit{" "}
-                <motion.span
-                  animate={{ opacity: [0.2, 1, 0.2] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                >
-                  ●●●
-                </motion.span>
-              </p>
-            )}
-            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-              <input
-                aria-label="Réponse"
-                placeholder="Votre réponse…"
-                value={msg}
-                onChange={(e) => setMsg(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && reply()}
-                style={line}
-              />
-              <button className="btn" onClick={reply}>
-                Répondre
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                <input
+                  aria-label="Réponse"
+                  placeholder="Votre réponse…"
+                  value={msg}
+                  onChange={(e) => setMsg(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && reply()}
+                  style={line}
+                />
+                <button className="btn" onClick={reply}>
+                  Répondre
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
