@@ -79,22 +79,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION CENTRÉE AU MILIEU */}
-      <section
-        style={{
-          padding: "120px 4vw",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
+      {/* SECTION À PROPOS - TITRE À CÔTÉ DU TEXTE, BLOC ENTIER CENTRÉ */}
+      <section className="split" style={{ padding: "120px 0", maxWidth: 1050, margin: "0 auto", justifyContent: "center", alignItems: "center" }}>
         <motion.h2
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -60 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
-          style={{ textAlign: "center" }}
         >
           Un univers,
           <br />
@@ -105,16 +96,10 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9, delay: 0.15 }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            textAlign: "center",
-            marginTop: 32,
-          }}
+          style={{ alignSelf: "center" }}
         >
           <p className="mono">01 — À propos</p>
-          <p style={{ maxWidth: 460, margin: "12px auto 24px", textAlign: "center" }}>
+          <p style={{ maxWidth: 420, margin: "12px 0 24px" }}>
             Un site qui se parcourt comme une collection de disques. Ouvrez le
             livret, écoutez les morceaux partagés, rejoignez la conversation.
           </p>
