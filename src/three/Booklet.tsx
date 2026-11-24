@@ -23,9 +23,30 @@ function Book({ open }: { open: boolean }) {
   useFrame(({ clock }, d) => {
     t.current += ((open ? 1 : 0) - t.current) * Math.min(1, d * 3.2)
     const e = t.current
-    if (cover.current) cover.current.rotation.y = -Math.PI * .995 * e
-    if (root.current) { root.current.position.x = -(1 - e); root.current.position.y = open ? 0 : Math.sin(clock.elapsedTime * 1.4) * .06
-      root.current.rotation.x = -.25 * (1 - e); root.current.rotation.y = -.35 * (1 - e) }
+    const time = clock.elapsedTime
+
+    // COUVERTURE - s'ouvre + petit tremblement de papier quand ouvert
+    if (cover.current) {
+      cover.current.rotation.y = -Math.PI * .995 * e + (open ? Math.sin(time * 1.8) * 0.012 : 0)
+    }
+
+    if (root.current) {
+      root.current.position.x = -(1 - e)
+
+      if (open) {
+        // OUVERT : il respire - flotte doucement, bascule à peine, comme tenu en main
+        root.current.position.y = Math.sin(time * 1.2) * 0.05
+        root.current.rotation.x = -0.02 + Math.sin(time * 1.2) * 0.015
+        root.current.rotation.y = Math.sin(time * 0.9) * 0.02
+        root.current.rotation.z = Math.sin(time * 0.9) * 0.012
+      } else {
+        // FERMÉ : flotte comme avant
+        root.current.position.y = Math.sin(time * 1.4) * .06
+        root.current.rotation.x = -.25 * (1 - e)
+        root.current.rotation.y = -.35 * (1 - e)
+        root.current.rotation.z = 0
+      }
+    }
   })
 
   const paper = new THREE.MeshStandardMaterial({ color: '#F5F4F0' })
