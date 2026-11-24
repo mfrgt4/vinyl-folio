@@ -91,7 +91,7 @@ export default function Submit() {
             transition={{ type: "spring", damping: 14 }}
             style={{ width: 160, height: 160, borderRadius: "50%", background: "#111", margin: "0 auto 24px", display: "grid", placeItems: "center", color: "#fff", fontSize: 48 }}
           >✓</motion.div>
-          <h2>Track ajoutée</h2>
+          <h2>Track &ensp; ajoutée</h2>
           <p className="mono" style={{ margin: "16px 0" }}>Elle rejoint la collection, tout le monde peut la voir.</p>
           <Link className="btn" to="/a-decouvrir">Retour à Vos chansons</Link>
         </div>
