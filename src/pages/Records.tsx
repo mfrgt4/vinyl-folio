@@ -120,7 +120,6 @@ export default function Records() {
       style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '90px 4vw 24px', display: 'flex', flexDirection: 'column' }}
     >
       <audio ref={a} src={cur.audio} onEnded={() => setPlaying(false)} />
-      <p className="mono">02 — Collection</p>
 
       <div className="stage" style={{ flex: 1, minHeight: 0, height: 'auto', marginTop: 0 }}>
         {VINYLS.map((v, k) => {

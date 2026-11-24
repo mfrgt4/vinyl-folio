@@ -24,7 +24,6 @@ export default function About() {
       className="page"
       style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
-      <p className="mono">03 — À propos</p>
 
       {/* Zone centrée : le livret s'adapte à la hauteur de l'écran pour tout tenir sans scroll */}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
