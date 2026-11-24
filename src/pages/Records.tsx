@@ -2,6 +2,60 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { VINYLS } from '../data'
 
+/** Disque : glisse hors de la pochette puis tourne, avec accélération et ralentissement progressifs */
+function Disc({ spinning }: { spinning: boolean }) {
+  const el = useRef<HTMLDivElement>(null)
+  const s = useRef({ a: 0, v: 0 })       // angle (deg) et vitesse (deg/s)
+  const target = useRef(0)
+  target.current = spinning ? 110 : 0
+
+  useEffect(() => {
+    let raf = 0
+    let last = performance.now()
+    const tick = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000)
+      last = t
+      s.current.v += (target.current - s.current.v) * Math.min(1, dt * 2.2) // inertie
+      s.current.a = (s.current.a + s.current.v * dt) % 360
+      if (el.current) el.current.style.transform = `rotate(${s.current.a}deg)`
+      // la boucle s'arrête quand le disque est à l'arrêt
+      if (target.current === 0 && s.current.v < 0.3) return
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [spinning])
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: '4%',
+        transform: spinning ? 'translateX(42%)' : 'translateX(0)',
+        transition: 'transform 1s cubic-bezier(.22,1,.36,1)',
+      }}
+    >
+      <div
+        ref={el}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          position: 'relative',
+          // reflet conique + sillons : le reflet rend la rotation visible
+          background:
+            'conic-gradient(from 0deg, transparent 0 18%, rgba(255,255,255,.14) 24%, transparent 30% 68%, rgba(255,255,255,.1) 74%, transparent 80%), repeating-radial-gradient(#111 0 2px, #1b1b1b 3px 4px)',
+          boxShadow: '0 10px 24px -12px #000a',
+        }}
+      >
+        <div style={{ position: 'absolute', inset: '36%', borderRadius: '50%', background: '#873B43' }}>
+          <div style={{ position: 'absolute', top: '10%', left: '46%', width: '8%', height: '8%', borderRadius: '50%', background: '#E8E7E2' }} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Records() {
   const [i, setI] = useState(0)
   const [open, setOpen] = useState(false)
@@ -20,10 +74,9 @@ export default function Records() {
     return () => { document.body.style.overflow = prev }
   }, [])
 
-  // Quand on change de vinyle, la musique s'arrête
+  // Changement de vinyle : la musique s'arrête et le disque rentre dans sa pochette
   useEffect(() => { a.current?.pause(); setPlaying(false) }, [i])
 
-  // Flèches du clavier
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') go(1)
@@ -33,7 +86,6 @@ export default function Records() {
     return () => removeEventListener('keydown', k)
   }, [])
 
-  // Molette / trackpad : un cran à la fois
   const onWheel = (e: React.WheelEvent) => {
     const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
     if (lock.current || Math.abs(d) < 30) return
@@ -42,7 +94,6 @@ export default function Records() {
     setTimeout(() => (lock.current = false), 450)
   }
 
-  // Lecture / pause de la musique du vinyle sélectionné
   const toggle = () => {
     const el = a.current
     if (!el || !cur.audio) { setOpen(true); return } // pas d'audio => on ouvre la fiche
@@ -79,7 +130,8 @@ export default function Records() {
               onKeyDown={e => e.key === 'Enter' && (o === 0 ? toggle() : setI(k))}
               style={{ top: '50%', marginTop: -120 }}
               animate={{
-                x: o * 190 + Math.sign(o) * 70,
+                // quand le disque sort, les vinyles de droite s'écartent pour lui laisser la place
+                x: o * 190 + Math.sign(o) * 70 + (playing && o > 0 ? 60 : 0),
                 scale: o === 0 ? 1.25 : 0.8,
                 rotateY: o * -32,
                 zIndex: 10 - Math.abs(o),
@@ -87,15 +139,7 @@ export default function Records() {
               }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             >
-              {/* Pendant la lecture : le disque sort de la pochette et tourne */}
-              <div
-                className="disc"
-                style={{
-                  translate: spinning ? '30% 0' : undefined,
-                  transition: 'translate .8s cubic-bezier(.2,.8,.2,1)',
-                  animation: spinning ? 'spin 3s linear infinite' : undefined,
-                }}
-              />
+              <Disc spinning={spinning} />
               <div
                 className="cover"
                 style={{
@@ -103,7 +147,7 @@ export default function Records() {
                   backgroundImage: v.cover ? `url("${v.cover}")` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  transform: spinning ? 'translateX(-14%)' : undefined,
+                  transform: 'none', // la pochette reste fixe (désactive le décalage au survol)
                 }}
               >
                 {!v.cover && (
@@ -121,9 +165,6 @@ export default function Records() {
         <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)' }}>{cur.title}</h2>
           <p className="mono" style={{ color: 'var(--red)' }}>{cur.cat} / {cur.year}</p>
-          <p className="mono" style={{ marginTop: 6 }}>
-            {cur.audio ? (playing ? '❚❚ En lecture — cliquer la pochette pour mettre en pause' : '▶ Cliquer la pochette pour écouter') : 'Pas de fichier audio'}
-          </p>
         </motion.div>
       </AnimatePresence>
 
