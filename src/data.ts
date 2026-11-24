@@ -13,7 +13,13 @@ export const VINYLS: Vinyl[] = [
   audio:'/audios/Know-My-Name.mp3',
   desc:'Un titre que je réécoute en boucle. Quatre voix, quatre univers qui se répondent avec énergie pop constante. Les artistes se répondent comme une vraie rencontre plutôt qu’un simple featuring.',
   tools:['K-pop','Electro']},
- {id:'v2',title:'Titre 2',cat:'Artiste 2',year:2025,color:'#D2D1CC',desc:'Votre texte.',tools:['Pop']},
+
+ {id:'v2',title:'R U Mine',cat:'Arctic Monkeys',year:2012,color:'#222',
+  cover:'/covers/R-U-Mine.jpeg',
+  audio:'/audios/R-U-Mine.mp3',
+  desc:'Un riff qui te prend dès la première seconde. Ce que j’aime ici, c’est la tension et l’énergie brute.',
+  tools:['Indie Rock','Garage Rock']},
+
  {id:'v3',title:'Watch Me',cat:'Sophie Powers, Mimi Webb',year:2026,color:'#9B0545',
   cover:'/covers/Watch-Me.jpeg',
   audio:'/audios/Watch-Me.mp3',
