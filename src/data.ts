@@ -15,7 +15,7 @@ export const VINYLS: Vinyl[] = [
   tools:['K-pop','Electro']},
 
  {id:'v2',title:'R U Mine',cat:'Arctic Monkeys',year:2012,color:'#222',
-  cover:'/covers/R-U-Mine.jpeg',
+  cover:'/covers/R-U-Mine.jpg',
   audio:'/audios/R-U-Mine.mp3',
   desc:'Un riff qui te prend dès la première seconde. Ce que j’aime ici, c’est la tension et l’énergie brute.',
   tools:['Indie Rock','Garage Rock']},
