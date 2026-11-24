@@ -99,7 +99,7 @@ export default function Community() {
   return (
     <div className="page">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <p className="mono">05 — Community</p>
+        <p className="mono"></p>
         <p className="mono">
           <span style={{ color: "var(--red)" }}>●</span> {online} en ligne
         </p>
