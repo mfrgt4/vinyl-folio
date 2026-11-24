@@ -170,7 +170,7 @@ export default function Records() {
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <motion.div key={cur.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <h2 style={{ fontSize: 'clamp(28px, 5vh, 48px)', margin: 0 }}>{cur.title}</h2>
           <p className="mono" style={{ color: 'var(--red)', margin: 0 }}>{cur.cat} / {cur.year}</p>
         </motion.div>
