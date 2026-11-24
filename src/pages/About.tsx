@@ -20,13 +20,14 @@ export default function About() {
     return () => { document.body.style.overflow = b; document.documentElement.style.overflow = h }
   }, [])
 
-  // SON D'OUVERTURE DU LIVRET
+  // SON D'OUVERTURE DU LIVRET - DOUX
   const toggleBook = () => {
     if (!open) {
       if (!audioRef.current) {
         audioRef.current = new Audio('/sounds/Open.mp3')
       }
       audioRef.current.currentTime = 0
+      audioRef.current.volume = 0.3
       audioRef.current.play().catch(() => {})
     }
     setOpen(!open)
