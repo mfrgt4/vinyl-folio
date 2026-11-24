@@ -1,8 +1,8 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-interface P { playing: boolean; kick: number; color: string; title: string; num: number; progress: number }
+interface P { playing: boolean; kick: number; color: string; title: string; num: number; progress: number; cover?: string }
 
 const toTex = (c: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t }
 const canvas = (S: number) => { const c = document.createElement('canvas'); c.width = c.height = S; return c }
@@ -31,7 +31,7 @@ function sheenTexture() {
   return toTex(c)
 }
 
-/** Label central : papier clair, liseré de couleur, n° + titre de la piste en cours */
+/** Label texte (secours quand il n'y a pas de pochette) */
 function labelTexture(title: string, num: number, color: string) {
   const S = 512, c = canvas(S), g = c.getContext('2d')!, R = S / 2
   g.fillStyle = color; g.beginPath(); g.arc(R, R, R, 0, Math.PI * 2); g.fill()
@@ -46,32 +46,58 @@ function labelTexture(title: string, num: number, color: string) {
   return toTex(c)
 }
 
-function Scene({ playing, kick, color, title, num, progress }: P) {
+/** Label = pochette recadrée en rond, avec un fin liseré et le trou central */
+function coverTexture(img: HTMLImageElement, color: string) {
+  const S = 512, c = canvas(S), g = c.getContext('2d')!, R = S / 2
+  g.save(); g.beginPath(); g.arc(R, R, R, 0, Math.PI * 2); g.clip()
+  const s = Math.min(img.width, img.height)
+  g.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, S, S)
+  g.restore()
+  g.strokeStyle = color; g.lineWidth = 8; g.beginPath(); g.arc(R, R, R - 4, 0, Math.PI * 2); g.stroke()
+  return toTex(c)
+}
+
+/** Charge la pochette ; en cas d'absence ou d'erreur, retombe sur le label texte */
+function useLabel(title: string, num: number, color: string, cover?: string) {
+  const [tex, setTex] = useState<THREE.CanvasTexture>(() => labelTexture(title, num, color))
+  useEffect(() => {
+    let dead = false
+    if (!cover) { setTex(labelTexture(title, num, color)); return }
+    const img = new Image()
+    img.onload = () => { if (!dead) setTex(coverTexture(img, color)) }
+    img.onerror = () => { if (!dead) setTex(labelTexture(title, num, color)) }
+    img.src = cover
+    return () => { dead = true }
+  }, [title, num, color, cover])
+  return tex
+}
+
+function Scene({ playing, kick, color, title, num, progress, cover }: P) {
   const spin = useRef<THREE.Group>(null), sheen = useRef<THREE.Mesh>(null)
   const v = useRef(0)
   const grooves = useMemo(grooveTexture, []), shine = useMemo(sheenTexture, [])
-  const label = useMemo(() => labelTexture(title, num, color), [title, num, color])
+  const label = useLabel(title, num, color, cover)
   const arc = useMemo(() => new THREE.RingGeometry(2.42, 2.44, 128, 1, 0, Math.max(.001, progress * Math.PI * 2)), [progress])
   useEffect(() => () => arc.dispose(), [arc])
   useEffect(() => { v.current = -14 }, [kick]) // scratch au changement de titre
 
   useFrame(({ clock }, d) => {
-    v.current += ((playing ? 2.6 : 0) - v.current) * Math.min(1, d * 2.2) // inertie au démarrage / à l'arrêt
+    v.current += ((playing ? 2.6 : 0) - v.current) * Math.min(1, d * 2.2) // inertie
     if (spin.current) spin.current.rotation.z += v.current * d
     if (sheen.current) sheen.current.rotation.z = clock.elapsedTime * .15
   })
 
   const a = progress * Math.PI * 2
+  const labelR = cover ? 0.95 : 0.75 // pochette un peu plus grande qu'un label texte
   return (
     <group>
       <group ref={spin}>
         <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[2.2, 2.2, .05, 96]} /><meshStandardMaterial color="#070707" roughness={.5} /></mesh>
         <mesh position={[0, 0, .026]}><circleGeometry args={[2.2, 128]} /><meshStandardMaterial map={grooves} metalness={.35} roughness={.45} /></mesh>
-        <mesh position={[0, 0, .032]}><circleGeometry args={[.75, 64]} /><meshBasicMaterial map={label} /></mesh>
+        <mesh position={[0, 0, .032]}><circleGeometry args={[labelR, 64]} /><meshBasicMaterial map={label} /></mesh>
         <mesh position={[0, 0, .034]}><circleGeometry args={[.05, 24]} /><meshBasicMaterial color="#E8E7E2" /></mesh>
       </group>
       <mesh ref={sheen} position={[0, 0, .03]}><circleGeometry args={[2.2, 128]} /><meshBasicMaterial map={shine} transparent blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      {/* Anneau de progression : fin trait gris + arc rouge + point (comme la maquette) */}
       <group rotation={[0, 0, Math.PI / 2]}>
         <mesh><ringGeometry args={[2.42, 2.435, 128]} /><meshBasicMaterial color="#D2D1CC" /></mesh>
         <mesh geometry={arc}><meshBasicMaterial color="#873B43" /></mesh>

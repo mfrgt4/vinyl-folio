@@ -122,7 +122,7 @@ export default function Songs() {
         {/* Vinyle */}
         <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
           <Suspense fallback={null}>
-            <Vinyl3D playing={playing} kick={i} color={cur.color} title={cur.title} num={i + 1} progress={progress} />
+            <Vinyl3D playing={playing} kick={i} color={cur.color} title={cur.title} num={i + 1} progress={progress} cover={cur.cover} />
           </Suspense>
         </div>
 
@@ -169,7 +169,7 @@ export default function Songs() {
             <button key={s.id} className={'track' + (k === i ? ' on' : '')} onClick={() => { setI(k); setPlaying(true) }}>
               {k === i && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--red)' }} />}
               <span className="mono">{k === i ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
-              <div className="sq" style={{ background: s.color }} />
+              <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <span>
                 <b style={{ fontWeight: 500 }}>{s.title}</b><br />
                 <span className="mono">{s.artist}{s.status === 'pending' ? ' · en validation' : ''}</span>
