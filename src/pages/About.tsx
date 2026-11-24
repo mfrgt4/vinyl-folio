@@ -6,9 +6,9 @@ export default function About() {
   const [open, setOpen] = useState(false)
   const lines = [
     'TRACK 01 — Présentation',
-    'Étudiant en design, passionné de musique et de typographie.',
+    'Manon, 20 ans, créative et passionnée de musique.',
     'TRACK 02 — Vision',
-    'Créer des objets numériques qui se touchent comme des disques.',
+    'Faire de la musique un lieu de rencontre, pas juste un fond sonore.',
   ]
 
   // Pas de défilement vertical sur cette page
