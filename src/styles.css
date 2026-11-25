@@ -9,7 +9,7 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
 .nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 4vw;mix-blend-mode:difference;color:#fff}
 .nav nav{display:flex;gap:28px}.nav a{font-family:'JetBrains Mono';font-size:11px;text-transform:uppercase;position:relative}
 .nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:#29C68A}
-.burger{display:none;font-size:22px;line-height:1;padding:8px}
+.burger{display:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;line-height:1;padding:10px 4px}
 .page{min-height:100vh;padding:120px 4vw 60px}
 .hero{height:100svh;min-height:560px;margin:-120px -4vw 0;background:#171717;color:var(--paper);display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;text-align:center;padding:120px 4vw 60px}
 .hero canvas{position:absolute!important;inset:0}.hero>*:not(canvas){position:relative}
@@ -31,7 +31,7 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
 .field input,.field textarea{width:100%;background:none;border:0;outline:0;font:300 28px Inter;padding:6px 0;color:var(--ink)}
 .err{color:var(--pink)}.tag{border:1px solid var(--line);padding:4px 12px;border-radius:99px;margin-right:8px;margin-bottom:8px}.tag.on{background:var(--ink);color:#fff}
 
-/* ============ RESPONSIVE SOIGNÉ ============ */
+/* ============ RESPONSIVE ============ */
 @media(max-width:1024px){
   .page{padding:110px 5vw 50px}
   .hero{margin:-110px -5vw 0;padding:110px 5vw 50px}
@@ -41,7 +41,8 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
 }
 @media(max-width:860px){
   body{font-size:15px}
-  .burger{display:block;mix-blend-mode:difference;color:#fff}
+  .burger{display:block;mix-blend-mode:difference;color:#fff;position:relative;z-index:70;font-size:11px;letter-spacing:.12em}
+  .burger[aria-expanded="true"]{font-size:18px;letter-spacing:0;padding:8px 10px}
   .nav{padding:14px 5vw}
   .nav nav{position:fixed;inset:0;background:var(--ink);flex-direction:column;justify-content:center;align-items:center;gap:32px;font-size:24px;transform:translateY(-100%);transition:transform .7s cubic-bezier(.7,0,.2,1);z-index:60;padding:80px 24px 40px}
   .nav nav.open{transform:none}
@@ -59,14 +60,17 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
   .sq{width:44px;height:44px}
   .field input,.field textarea{font-size:22px}
   .btn{padding:12px 20px}
-  /* PAGE CHANSONS : on empile */
   .page .split{grid-template-columns:1fr !important;gap:0 !important}
   .page .split h1{white-space:normal !important;font-size:clamp(44px,15vw,72px) !important;line-height:.9 !important}
   .vw-wrap{min-height:0 !important;margin-left:0 !important;justify-content:center !important}
   .vw{width:min(300px,80vw) !important;height:auto !important;aspect-ratio:1 !important;margin:0 auto !important;flex-shrink:1 !important}
-  /* LIVRET : contenu lisible */
   .about-overlay{left:6% !important;top:14% !important;width:88% !important;height:72% !important;grid-template-columns:1fr 1.2fr !important}
   .about-text{font-size:11px !important;line-height:1.45 !important;padding:10px !important;overflow:auto !important}
+  /* MOBILE ABOUT : on cache le livret, on montre photo + texte ET ON LAISSE SCROLLER */
+  .about-page{height:auto !important;min-height:100svh !important;overflow:visible !important;padding:100px 16px 32px !important}
+  .about-desktop{display:none !important}
+  .about-mobile{display:flex !important;overflow:visible !important}
+  html,body{overflow:auto !important;overflow-x:hidden !important}
 }
 @media(max-width:600px){
   .page{padding:88px 16px 32px}
@@ -96,11 +100,4 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
   .track{grid-template-columns:24px 36px 1fr auto}
   .sq{width:36px;height:36px}
   .btn{font-size:10px;padding:11px 16px}
-}
-/* MOBILE : on cache le livret, on montre juste photo + texte ET ON LAISSE SCROLLER */
-@media(max-width:860px){
-  .about-page{height:auto !important;min-height:100svh !important;overflow:visible !important;padding:100px 16px 32px !important}
-  .about-desktop{display:none !important}
-  .about-mobile{display:flex !important;overflow:visible !important}
-  html,body{overflow:auto !important;overflow-x:hidden !important}
 }
