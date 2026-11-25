@@ -94,7 +94,6 @@ export default function Songs() {
     return () => { supabase.removeChannel(ch) }
   }, [])
 
-  // VRAIE DURÉE DE CHAQUE MP3 - pour l'afficher au bout de chaque ligne
   useEffect(() => {
     rows.forEach((r: any) => {
       if (!r.audio_url || durs[r.id]) return
@@ -109,7 +108,6 @@ export default function Songs() {
     })
   }, [rows])
 
-  // BLOQUE LE SCROLL DE LA PAGE DERRIÈRE QUAND "TOUTES LES PROPOSITIONS" EST OUVERT
   useEffect(() => {
     if (!allOpen) return
     const b = document.body.style.overflow, h = document.documentElement.style.overflow
@@ -166,7 +164,6 @@ export default function Songs() {
       `}</style>
 
       <div className="split" style={{ alignItems: 'center', position: 'relative', gridTemplateColumns: '1.05fr 0.95fr', gap: '24px' }}>
-        {/* VINYLE GÉANT - taille directe, pas d'effet de zoom à l'arrivée */}
         <div className="vw-wrap">
           <div className="vw" onClick={() => setPlaying(!playing)} role="button" aria-label={playing ? 'Pause' : 'Lecture'}>
             <AnimatePresence mode="wait" initial={false}>
@@ -186,9 +183,8 @@ export default function Songs() {
           </div>
         </div>
 
-        {/* TEXTE - toujours au-dessus, jamais recouvert, jamais coupé à droite */}
         <div style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
-          <h1 style={{ fontSize: 'clamp(40px,6vw,92px)', whiteSpace: 'nowrap' }}>VOS<br />CHANSONS</h1>
+          <h1 style={{ fontSize: 'clamp(40px,6vw,92px)' }}>VOS<br />CHANSONS</h1>
 
           <div style={{ margin: '28px 0 8px' }}>
             <p className="mono" style={{ color: 'var(--pink)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -196,7 +192,7 @@ export default function Songs() {
             </p>
             <AnimatePresence mode="wait">
               <motion.div key={cur.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                <div style={{ font: '700 clamp(24px,3vw,40px)/1.1 Archivo, sans-serif', letterSpacing: '-.02em', margin: '8px 0 4px' }}>{cur.title}</div>
+                <div style={{ font: '700 clamp(24px,3vw,40px)/1.1 Archivo, sans-serif', letterSpacing: '-.02em', margin: '8px 0 4px', overflowWrap: 'break-word' }}>{cur.title}</div>
                 <p className="mono">{cur.artist}{cur.by ? ` · par ${cur.by}` : ''}</p>
               </motion.div>
             </AnimatePresence>
@@ -222,11 +218,10 @@ export default function Songs() {
                 {k === safeI && <motion.span layoutId="act" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2, background: 'var(--pink)' }} />}
                 <span className="mono">{k === safeI ? <Eq on={playing} /> : String(k + 1).padStart(2, '0')}</span>
                 <div className="sq" style={{ backgroundColor: s.color, backgroundImage: s.cover ? `url("${s.cover}")` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <span>
-                  <b style={{ fontWeight: 500 }}>{s.title}</b><br />
+                <span style={{ minWidth: 0 }}>
+                  <b style={{ fontWeight: 500, overflowWrap: 'break-word' }}>{s.title}</b><br />
                   <span className="mono">{s.artist}{s.by ? ` · par ${s.by}` : ''}</span>
                 </span>
-                {/* DURÉE AU BOUT, À DROITE */}
                 <span className="mono">{s.dur}</span>
               </button>
             )
@@ -265,8 +260,8 @@ export default function Songs() {
                 <button key={s.id} onClick={() => chooseFromAll(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'baseline', gap: 16, padding: '16px 0', background: 'none', border: 0, borderBottom: '1px solid #d8d7d2', color: 'var(--ink)', textAlign: 'left', cursor: 'pointer' }}>
                   <span className="mono" style={{ opacity: .5 }}>{String(k + 1).padStart(2, '0')}</span>
                   {s.cover && <img src={s.cover} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />}
-                  <span style={{ flex: 1 }}>
-                    <span style={{ display: 'block', fontSize: 17 }}>{s.title}</span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 17, overflowWrap: 'break-word' }}>{s.title}</span>
                     <span className="mono" style={{ opacity: .6 }}>{s.artist} {s.by ? `· par ${s.by}` : ''}</span>
                   </span>
                   <span className="mono">{durs[s.id] ?? '—:——'}</span>
