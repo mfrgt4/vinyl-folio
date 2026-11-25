@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { motion } from 'framer-motion'
 const Booklet = lazy(() => import('../three/Booklet'))
 
@@ -11,25 +11,18 @@ export default function About() {
     'Faire de la musique un lieu de rencontre, pas juste un fond sonore.',
   ]
 
-  useEffect(() => {
-    const b = document.body.style.overflow, h = document.documentElement.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.documentElement.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = b; document.documentElement.style.overflow = h }
-  }, [])
-
   return (
     <div
       className="page about-page"
-      style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
+      style={{ minHeight: '100dvh', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
       {/* ===== VERSION MOBILE : JUSTE TA PHOTO + TON TEXTE, SANS LIVRET ===== */}
-      <div className="about-mobile" style={{ display: 'none', flex: 1, minHeight: 0, overflowY: 'auto', flexDirection: 'column', gap: 20, paddingBottom: 20 }}>
+      <div className="about-mobile" style={{ display: 'none', flexDirection: 'column', gap: 20, paddingBottom: 20 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ position: 'relative', width: '100%', aspectRatio: '4/5', overflow: 'hidden', background: '#111' }}
+          style={{ position: 'relative', width: '100%', aspectRatio: '4/5', overflow: 'hidden', background: '#111', flexShrink: 0 }}
         >
           <img
             src="/images/portrait.jpg"
