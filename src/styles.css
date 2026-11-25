@@ -97,3 +97,9 @@ h1{font-size:clamp(48px,11vw,200px)}h2{font-size:clamp(36px,8vw,110px)}
   .sq{width:36px;height:36px}
   .btn{font-size:10px;padding:11px 16px}
 }
+/* MOBILE : on cache le livret, on montre juste photo + texte */
+@media(max-width:860px){
+  .about-page{height:auto !important;min-height:100svh !important;overflow:visible !important;padding:100px 16px 32px !important}
+  .about-desktop{display:none !important}
+  .about-mobile{display:flex !important;overflow:visible !important}
+}

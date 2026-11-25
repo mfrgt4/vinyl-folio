@@ -20,10 +20,49 @@ export default function About() {
 
   return (
     <div
-      className="page"
+      className="page about-page"
       style={{ height: '100dvh', minHeight: 0, overflow: 'hidden', padding: '80px 2vw 16px', display: 'flex', flexDirection: 'column' }}
     >
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      {/* ===== VERSION MOBILE : JUSTE TA PHOTO + TON TEXTE, SANS LIVRET ===== */}
+      <div className="about-mobile" style={{ display: 'none', flex: 1, minHeight: 0, overflowY: 'auto', flexDirection: 'column', gap: 20, paddingBottom: 20 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          style={{ position: 'relative', width: '100%', aspectRatio: '4/5', overflow: 'hidden', background: '#111' }}
+        >
+          <img
+            src="/images/portrait.jpg"
+            alt="Portrait de Manon"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(1) contrast(1.15)' }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(23,23,23,.65), transparent 55%)' }} />
+          <p className="mono" style={{ position: 'absolute', left: 16, bottom: 14, color: '#fff', margin: 0 }}>Manon — Vinyl Folio</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15 }}
+          style={{ background: '#171717', color: '#ddd', padding: '24px 20px' }}
+        >
+          {lines.map((l, k) => (
+            <motion.p
+              key={k}
+              className={k % 2 ? '' : 'mono'}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + k * 0.15 }}
+              style={{ marginBottom: 14, fontSize: 16, lineHeight: 1.6, color: k % 2 ? '#ddd' : 'var(--pink)' }}
+            >
+              {l}
+            </motion.p>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* ===== VERSION DESKTOP : LE LIVRET 3D ===== */}
+      <div className="about-desktop" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <div
           role="button"
           tabIndex={0}
